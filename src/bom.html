@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BOM</title>
+</head>
+<script>
+
+    var age = 10;
+    var getName = function(){
+        return this.name;
+    };
+    window.name = 'Jim';
+    function getAge(){
+        return 'fk';
+    }
+    console.log(delete window.age);
+    console.log(delete window.getName);
+    console.log(delete window.getAge);
+    console.log(delete window.name);
+    console.log(window.getAge());
+    console.log(window.getName());
+
+</script>
+<body>
+
+</body>
+</html>
