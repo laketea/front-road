@@ -87,9 +87,95 @@ ie,opera,chrome中screenLeft和screenTop中保存的是屏幕左上角到window�
 	
 	
 ##二。location
+location提供了当前窗口中加载的文档相关信息以及一些导航功能。location即是window的对象也是document的对象。
+下面以url（http://www.laketea.com:80/news/1.html#content?q=js）为例介绍其所有属性：
+
+	- hash //返回url中的hash，若不包含hash则返回空字符串 '#conent'
+	- host //返回服务器名称以及端口号 'www.laketea.com:80' 
+	- hostname //返回服务器名称 ‘www.laketea.com’
+	- href //返回页面的完整url,toString返回返回的值一样 ‘http://www.laketea.com:80/news/1.html#content?q=js’
+	- pathname //返回url中的目录 ‘/news/1.html’
+	- port //返回端口 '80'
+	- protocol //返回协议 'http:'
+	- search //返回url中的查询字符串,以问号开头 '?q=js'	
+#####解析查询字符串参数
+location并没有提供查询字符串中的参数解析方法，可参考如下方法
+
+	function getQueryStringArs() {
+        var qs = (location.search.length > 0 ? location.search.substring(1) : ''),
+                args = {},
+                items = qs.length ? qs.split('&') : [],
+                item = null,
+                name = null,
+                value = null;
+
+        for(var i= 0,len=items.length;i<len;i++){
+            item = items[i].split('=');
+            name = decodeURIComponent(item[0]);
+            value = decodeURIComponent(item[1]);
+            if(name.length){
+                args[name] = value;
+            }
+        }
+        
+        return args;
+    }	
+
+#####位置操作
+以下语句都会使得当前页面以新的url加载(hash除外),并且浏览器的历史记录会生成一条记录，可以通过浏览器的后退按钮返回。
+
+	location.assign('www.laketea.com') //
+	window.location = 'http://www.laketea.com';
+	location.href = 'http://www.laketea.com';//必须加协议名称,否则当成相对路径
+	location.hash = '#conent';//除外
+	location.search = '?q=jss';
+	location.hostname = 'www.laketea.com';
+	location.pathname = 'mydir';
+	location.port = 8080;
 	
+replace方法会加载新的url，但是不会在历史记录中生成新的记录，后退无效。
+
+	replace('http://www.baidu.com')
 	
-                                                                                                                                   
+reload方法，作用是重新加载当前页面，不传参数则，判断页面是否改变来决定从缓存中还是从服务器加载，如果传入true，则强制从服务器重新加载
+	
+	reload();//可能从缓存
+	reload(true);//从服务器
+
+## 三.frames
+	
+## 四.navigator
+提供识别客户端浏览器的信息
+
+## 五.screen
+screen对象主要保存一些显示器的信息，
+
+## 六.history
+history对象保存用户上网的历史记录（当前窗口）。开发人员无法获取访问列表，但是可以实现后退，前进，以及获取历史记录总数
+
+	history.go(-1);//后退一页
+	history.go(1);//前进一页
+	history.go(2);//前进两页
+	//如果传入的参数是字符串，则从历史记录查找包含该历史记录的位置，如果包含，则调整到最近的位置，如果不包含，则什么也不做
+	history.go('www.baidu.com');	
+	history.back();//后退
+	history.forward();//前进
+	history.length // =0，则可确定当前页面是打开窗口后的第一个页面
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          
+                                                                                                          
 	
 	
 
