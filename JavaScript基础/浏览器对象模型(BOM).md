@@ -143,6 +143,16 @@ reload方法，作用是重新加载当前页面，不传参数则，判断页�
 	reload(true);//从服务器
 
 ## 三.frames
+window.frames,如果页面包含框架，则每个框架里的页面的window包含在父页面的frames中，通过数值（0开始，从左到右，从上到下）或框架名称来访问。  
+
+**window.top**对象始终指向最高层的window  
+**window.parent**指向父window，如果没有框架，则=当前window  
+**self** 指向当前页面的window  
+
+	注意：每个框架都有自己的一套构造函数，这些构造函数一一对应，但是并不相等。
+	top.Object 不等于 top.frames[0].Object, 主要影响到instanceof操作符
+
+
 	
 ## 四.navigator
 提供识别客户端浏览器的信息
@@ -161,6 +171,7 @@ history对象保存用户上网的历史记录（当前窗口）。开发人员�
 	history.back();//后退
 	history.forward();//前进
 	history.length // =0，则可确定当前页面是打开窗口后的第一个页面
+	
 
 
 
