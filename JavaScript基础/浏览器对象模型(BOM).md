@@ -14,7 +14,7 @@ BOM结构如下：
 		- screen
 		
 ##一.window
-window对象有两重身份，一个是js浏览器的接口，一个是ECMAScript的global对象。
+window对象有两重身份，一个是js访问浏览器的接口，一个是ECMAScript的global对象。
 
 在全局作用域上声明的变量函数等都是window的属性或方法，这样定义的属性或变量有一个名为[[Configurable]]的特性（false），不可以通过delete删除，但是直接在window中定义的属性或方法可以通过delete删除。
 
