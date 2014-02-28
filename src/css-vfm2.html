@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HEAD>
+    <TITLE>Anonymous text interrupted by a block</TITLE>
+    <style>
+        div {
+            width: 200px;
+            border: 1px solid gold;
+        }
+
+        span {
+            border: 1px solid red;
+        }
+
+        p {
+            width: 100px;
+            border: 1px solid green;
+        }
+    </style>
+</HEAD>
+<BODY>
+<div>
+       <span>This is anonymous text before the P.
+           <P>This is the content of P.</P>
+             This is anonymous text after the P.
+       </span>
+</div>
+<div style="position:static; width:100px;">
+    <div id="A" style="background-color:green;">A</div>
+    <div id="B" style="position:relative;top:70px; left:50px;background-color:red;">B</div>
+    <div id="C" style="background-color:blue;">C</div>
+</div>
+
+
+<div style="margin-top:500px;position:absolute; width:300px; border:2px solid yellow;">
+    <div id="A" style="background-color:green;height:50px;">A</div>
+    <div id="B" style="position:absolute;top:70px; left:50px; height:50px; background-color:red;">B</div>
+    <div id="C" style="background-color:blue;height:50px;">C</div>
+</div>
+</BODY>

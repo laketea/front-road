@@ -4,6 +4,20 @@
     <title></title>
 </head>
 <script>
+    var name = 'World!';
+    (function () {
+        if (typeof name === 'undefined') {
+
+//            if ('fuck' === '33') {
+//                var name = 'fuckfuck';
+//            }
+//            var fkname = 'Jack';
+            console.log('Goodbye ' + name);
+        } else {
+            console.log('Hello ' + name);
+        }
+    })();
+
     function getQueryStringArs() {
         var qs = (location.search.length > 0 ? location.search.substring(1) : ''),
                 args = {},
@@ -12,11 +26,11 @@
                 name = null,
                 value = null;
 
-        for(var i= 0,len=items.length;i<len;i++){
+        for (var i = 0, len = items.length; i < len; i++) {
             item = items[i].split('=');
             name = decodeURIComponent(item[0]);
             value = decodeURIComponent(item[1]);
-            if(name.length){
+            if (name.length) {
                 args[name] = value;
             }
         }

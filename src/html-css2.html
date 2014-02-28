@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+    <TITLE>Float example</TITLE>
+    <STYLE type="text/css">
+        #C {
+            margin: 2em;
+            border: 1px solid red;
+            width: 200px;
+            overflow: hidden;
+        }
+    </STYLE>
+    <!--<style type="text/css">-->
+        <!--.sub {-->
+            <!--width: 100px;-->
+            <!--height: 100px;-->
+            <!--background-color: green;-->
+            <!--margin:0 20px;-->
+        <!--}-->
+    <!--</style>-->
+    <style type="text/css">
+        .sub {
+            width: 100px;
+            height: 100px;
+            background-color: green;
+            margin: 10px;
+        }
+    </style>
+</HEAD>
+<BODY>
+<div id="C">
+    <div id="A" style="width:50px; height:50px; background-color:green; margin:20px; float: left;">A</div>
+    <div id="B" style=" width:50px; background-color:blue; overflow:hidden;">B</div>
+</div>
+
+<div style="width:500px; border:2px solid red; overflow:hidden;">
+    <div class="sub" style="float:left;">left</div>
+    <div class="sub" style="float:right;">right</div>
+</div>
+
+<div id="container" style="width:200px; overflow:hidden; border:1px solid red;">
+    <div class="sub" style="float:left;">left</div>
+    <div class="sub" style="float:right;">right</div>
+</div>
+</BODY>
+</HTML>

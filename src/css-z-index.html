@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div style="position:absolute; width:100px; z-index:3;  height:100px; background-color:green;">
+    A
+    <div style="position:relative;width:125px; height:25px; z-index:2; background-color:yellow;"> C </div>
+    <div style="position:relative;width:25px; height:25px; top:-10px; background-color:blue;"> D </div>
+</div>
+<div style="position:absolute; width:100px; height:100px; background-color:red; top:20px; left:90px; text-align:right;">
+    B
+</div>
+
+<div style="position:relative; width:300px; height:300px; border:5px solid red; padding:10px; background-color:green; z-index:0;">
+    <div style="position:absolute; width:100px; height:100px; top:-1px; left:2px; border:5px solid blue; padding:10px; background-color:yellow; z-index:-1;"></div>
+    <br/>
+    <br/>
+    <div style="width:100px; float:left; margin-left:40px; height:100px; border:5px solid gold; padding:10px; background-color:blue;"></div>
+    <div style="width:100px; height:100px; margin-left:20px; margin-top:-20px; border:5px solid gold; padding:10px; background-color:gray;"></div>
+    <div style="position:absolute; top:70px; left:70px; width:100px; height:100px; border:5px solid red; padding:10px; background-color:yellow; z-index:1;"></div>
+</div>
+</body>
+</html>
