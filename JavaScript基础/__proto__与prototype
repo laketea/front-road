@@ -1,0 +1,65 @@
+#__proto__与prototype
+
+看Ember create方法的源代码的时候突然对js的__proto__与prototype有点迷糊了，遂查点资料记录一下。
+
+### prototype
+
+每一个函数都会有一个prototype属性(原型)
+
+### __proto__
+__proto__是对象上的一个内置属性，当我们访问一个对象的属性时，如果这个对象内部不存在这个属性，那么他就会去__proto__里找这个属性，也就是原型链的概念  
+在javascript高级编程里面说到，创建构造函数新实例时，有一步 是 ‘将构造函数的作用域赋给新对象’，这一步大概可以理解为,将新对象的__proto__设置为构造函数  
+prototype。
+
+	var Person = function(name) {
+	    this.name = name;
+	}
+	var p = new Person();
+
+这里有一个特殊的地方要注意:
++ 所有构造器或者函数的 __proto__都指向 Function.prototype.故所有的构造器以及对应实例化后的对象都拥有Function.prototype的属性及方法。如length、call、apply、bind（ES5）。
++ Function.prototype的__proto__ 又指向 Object.prototype ，故所有的构造器以及对应实例化后的对象都拥有Object.prototype的属性及方法。如length、call、apply、bind（ES5）。
++ Object.prototype.__proto__ = null,封顶了··
+
+	Number.__proto__ === Function.prototype  // true
+	Boolean.__proto__ === Function.prototype // true
+	String.__proto__ === Function.prototype  // true
+	Object.__proto__ === Function.prototype  // true
+	Function.__proto__ === Function.prototype // true 
+	Array.__proto__ === Function.prototype   // true
+	RegExp.__proto__ === Function.prototype  // true
+	Error.__proto__ === Function.prototype   // true
+	Date.__proto__ === Function.prototype    // true
+
+
+	//只有Function的prototype的typeof 是 function
+	console.log(typeof Function.prototype) // function  //function Empty() {}
+	console.log(typeof Object.prototype)   // object
+	console.log(typeof Number.prototype)   // object
+	console.log(typeof Boolean.prototype)  // object
+	console.log(typeof String.prototype)   // object
+	console.log(typeof Array.prototype)    // object
+	console.log(typeof RegExp.prototype)   // object
+	console.log(typeof Error.prototype)    // object
+	console.log(typeof Date.prototype)     // object
+	console.log(typeof Object.prototype)   // object
+
+__proto__目前在IE6/7/8/9中都不支持。IE9中可以使用Object.getPrototypeOf(ES5)获取对象的内部原型
+
+	var p = {}
+	var __proto__ = Object.getPrototypeOf(p)
+	console.log(__proto__ === Object.prototype) // true
+
+原型莲图见：
+http://www.kankanews.com/ICkengine/wp-content/plugins/wp-o-matic/cache/1268dc44a3_215445-09Zx-992034.png
+http://images.cnitblog.com/blog/244227/201304/10231048-067b5e5d8cbc4acb80424b5786a28754.jpg
+
+
+### constructor
+constructor 指向对象的构造器
+
+	var p = {}
+	console.log(Object.prototype) // 为一个空的对象{}
+	console.log(p.constructor === Object) // 对象直接量方式定义的对象其constructor为Object
+	console.log(p.constructor.prototype === Object.prototype) // 为true，不解释 
+
