@@ -1,0 +1,11 @@
+Ember.Object
+
+Ember.Object = Ember.CoreObject.extend(Ember.Observable);
+Ember.Object.toString = function() { return "Ember.Object"; };
+
+Object混合了 CoreObject以及Observable
+。。。
+so ···
+
+Ember.Observable
+这个类的名称应该怎么翻译的······

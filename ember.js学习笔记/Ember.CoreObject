@@ -1,0 +1,51 @@
+Ember.CoreObject
+
+###构造函数
+CoreObject 的构造函数是Class,通过makeCtor()函数返回
+
+CoreObject 有两个非常重要的属性(PrototypeMixin,ClassMixin),这两个属性都是Mixin实例.
+
+PrototypeMixin
+PrototypeMixin:{
+	reopen,
+	init,
+	concatenatedProperties,aRRAY
+	...
+}
+
+ClassMixin:{
+	extend,
+		新建一个Class，然后将ClassMixin，PrototypeMixin 创建新的mix对象，复制到新的class
+		将参数中的对象mix到new class的prototype(？)
+	createWithMixins,
+	create,
+		new C()
+	reopen,
+		mix 参数到 PrototypeMixin
+	reopenClass,
+		mix 参数到 ClassMixin
+	....
+}
+
+目前的疑问，PrototypeMixin/ClassMixin 如何转换为当前实例或类的属性。
+
+通过reopen都是mix到 PrototypeMixin
+而reopenClass mix到 ClassMixin中，
+这两个分别对应实例以及类的方法。
+
+
+###Extend
+
+
+
+###Create
+
+
+这里要注意的就是搞清楚 ClassMixin与PrototypeMixin
+
+
+
+
+http://www.cerebris.com/blog/2012/03/06/understanding-ember-object/
+
+

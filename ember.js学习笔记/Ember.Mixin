@@ -1,0 +1,120 @@
+#Ember.Mixin源码分析
+---
+
+Mixin主要的目的是用来做为多个class或object共享的，
+关于计算属于与初始化定义的属性不能被共享，目前还看不出来，估计要看下Object.extend的机制
+
+####create过程分析
+
+	Mixin.create = function() {
+	  	Ember.anyUnprocessedMixins = true;
+	  	var M = this;
+	  	//新建一个Mixin 做为需要合并到的object
+		return initMixin(new M(), arguments);
+	}
+
+	Ember.Mixin = function() { return initMixin(this, arguments); };
+
+	function initMixin(mixin, args) {
+	  if (args && args.length > 0) {
+	  	//根据传入的参数，对每个object新建一个mixin，并将object设置为mixin的properties属性
+	  	//将object对应的每一个mixin push到 空的mixin的mixins数组
+	    mixin.mixins = a_map.call(args, function(x) {
+	      if (x instanceof Mixin) { return x; }
+
+	      // Note: Manually setup a primitive mixin here. This is the only
+	      // way to actually get a primitive mixin. This way normal creation
+	      // of mixins will give you combined mixins...
+	      var mixin = new Mixin();
+	      mixin.properties = x;
+	      return mixin;
+	    });
+	  }
+	  return mixin;
+	}
+
+####主要API
+
+APPLY  
+
+	MixinPrototype.apply = function(obj) {
+	  //合并obj与this属性
+	  return applyMixin(obj, [this], false);
+	};
+
+CREATE
+
+REOPEN
+reopnen其实就是将args中的对象按照create的步骤添加到mixin.mixins对象中
+	MixinPrototype.reopen = function() {
+	  var mixin, tmp;
+
+	  if (this.properties) {
+	  	//这块的意思是，如果当前properties存在，则将当前properties中的属性，新建一个mixin，然后设置到期的properties中，
+	  	//貌似只有被mixin的 mixins中的子对象会拥有properties属性
+	    mixin = Mixin.create();
+	    mixin.properties = this.properties;
+	    delete this.properties;
+	    this.mixins = [mixin];
+	  } else if (!this.mixins) {
+	    this.mixins = [];
+	  }
+
+	  var len = arguments.length, mixins = this.mixins, idx;
+
+	  for(idx=0; idx < len; idx++) {
+	    mixin = arguments[idx];
+	    Ember.assert('Expected hash or Mixin instance, got ' + Object.prototype.toString.call(mixin),
+	                 typeof mixin === 'object' && mixin !== null && Object.prototype.toString.call(mixin) !== '[object Array]');
+
+	    if (mixin instanceof Mixin) {
+	      mixins.push(mixin);
+	    } else {
+	      tmp = Mixin.create();
+	      tmp.properties = mixin;
+	      mixins.push(tmp);
+	    }
+	  }
+
+	  return this;
+	};
+
+
+DETECT
+检查当前mixin是否包含子obj这个mixin
+
+	MixinPrototype.detect = function(obj) {
+	  if (!obj) { return false; }
+	  if (obj instanceof Mixin) { return _detect(obj, this, {}); }
+	  var m = obj[META_KEY],
+	      mixins = m && m.mixins;
+	  if (mixins) {
+	    return !!mixins[guidFor(this)];
+	  }
+	  return false;
+	};
+
+
+	function _detect(curMixin, targetMixin, seen) {
+	  var guid = guidFor(curMixin);
+
+	  if (seen[guid]) { return false; }
+	  seen[guid] = true;
+
+	  if (curMixin === targetMixin) { return true; }
+	  var mixins = curMixin.mixins, loc = mixins ? mixins.length : 0;
+	  while (--loc >= 0) {
+	  	//递归检查
+	    if (_detect(mixins[loc], targetMixin, seen)) { return true; }
+	  }
+	  return false;
+	}
+
+###Ember.mixin
+将多个对象混合成一个对象·
+Ember.mixin = function(obj) {
+  var args = a_slice.call(arguments, 1);
+  applyMixin(obj, args, false);
+  return obj;
+};
+
