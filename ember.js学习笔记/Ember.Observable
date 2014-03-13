@@ -1,0 +1,135 @@
+＃Ember.Observable
+---
+
+Observable主要提供观察者的实现吧，这个被mix到Object中，而所有ember的class都是继承自object，也就是是说ember所有的object都支持观察者的实现。
+其主要实现的功能：observable,binging,Computed
+下面具体来看看其实现。
+
+
+###基本用法
+
+首先还是看看GUIDE里面的用法，先熟悉基本的用法
+
+三种方式:
+
+1.function-propertoy方式
+	fullName: function() {
+	    var firstName = this.get('firstName');
+	    var lastName = this.get('lastName');
+
+	    return firstName + ' ' + lastName;
+	  }.property('firstName', 'lastName'),
+
+	  fullNameChanged: function() {
+	    // deal with the change
+	  }.observes('fullName').on('init')
+
+2.Ember.observer
+	Person.reopen({
+	  fullNameChanged: Ember.observer('fullName', function() {
+	    // deal with the change
+	  })
+
+3.addObserver
+
+	person.addObserver('fullName', function() {
+	  // deal with the change
+	});
+
+关于观察者，貌似有几个坑要注意
+1.Ember中的观察模式是同步的，也就是说属性一改变会立即触发事件，这样的话再两种情况下会出现问题，
+	1）.观察了多个属性，每个属性change都会执行一次,如果是连续的改变两个属性的值就会执行两次
+	2）。观察事件的触发会先于计算属性的改变，如果方法里面的又正好用到相关的计算属性，这个时候，里面的计算属性还是旧的值.
+	以上两个问题可以通过Ember.run解决
+
+	Person.reopen({
+	  partOfNameChanged: function() {
+	    Ember.run.once(this, 'processFullName');
+	  }.observes('firstName', 'lastName'),
+
+	  processFullName: function() {
+	    // This will only fire once if you set two properties at the same time, and
+	    // will also happen in the next run loop once all properties are synchronized
+	    console.log(this.get('fullName'));
+	  }
+	});
+
+
+2.观察者与初始化的关系。
+	默认情况下，只有在对象初始化完成，才会触发执行观察者。也就是说init中改变属性默认是不会触发change事件的
+	但是可以通过on ('init'),让init中的属性改变也触发change事件.
+
+	 	App.Person = Ember.Object.extend({
+                init: function() {
+                    this.set('salutation', "Mr/Ms");
+                },
+
+                salutationDidChange: function() {
+                    // some side effect of salutation changing
+                    console.log('---add server fuck;');
+                }.observes('salutation').on('init')
+            });
+
+3.UNCONSUMED COMPUTED PROPERTIES DO NOT TRIGGER OBSERVERS
+
+
+
+### 实现分析
+
+以下大部分方法都是调用Ember对应的方法
+
+get:key;Ember.get(this,keyName);
+
+获取多个属性,返回对应属性组件的对象
+getProperties:
+
+set:key:value;set(this,keyName,value)
+
+//设置多个属性
+setProperties
+
+//当设置一组属性改变时，可以调用此方法，这样属性改变事件就不会通知，知道 endPropertyChanges方法调用
+beginPropertyChanges()
+
+//以上面配套使用
+endPropertyChanges()
+
+//下面两个方法配套一起使用，如果直接更改对象的属性，又想触发change 观察者，则可调用这两个方法
+propertyWillChange(key)
+propertyDidChange(key)
+
+//配合上面两个方法
+notifyPropertyChange（key）
+
+//不知道是干嘛的·
+addBeforeObserver: function(key, target, method)
+
+//添加观察者
+addObserver: function(key, target, method) 
+
+//删除观察者
+emoveObserver: function(key, target, method)
+
+//判断是否有观察key
+hasObserverFor: function(key) 
+
+//as you knoew
+getWithDefault: function(keyName, defaultValue) 
+
+//递增
+incrementProperty: function(keyName, increment)
+
+//属性递减
+decrementProperty: function(keyName, decrement)
+
+//属性toggle
+toggleProperty: function(keyName)
+
+cacheFor: function(keyName) 
+observersForKey: function(keyName) 
+
+
+
+
+
+
