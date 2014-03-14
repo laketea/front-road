@@ -129,6 +129,19 @@ cacheFor: function(keyName)
 observersForKey: function(keyName) 
 
 
+###源码分析
+
+####addObserver
+
+	Ember.addObserver = function(obj, _path, target, method) {
+		//changeEvent:_path:change;
+	  Ember.addListener(obj, changeEvent(_path), target, method);
+	  Ember.watch(obj, _path);
+
+	  return this;
+	};
+
+
 
 
 

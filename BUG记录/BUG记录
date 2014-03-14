@@ -1,0 +1,6 @@
+BUG记录
+
+1.IE9，
+	alert('')
+	代码调试到这行的时候，竟然进入textarea的focus事件，
+	而focus事件里面 使用textarea的select方法，select方法ie9中隐藏状态下 会抛出函数不正确的错误

@@ -1,0 +1,29 @@
+＃占楼
+---
+主要从以下几个方面来分析:
+
+1.Ember.js的对象体系
+
+	Mix,CoreObject
+
+2.Ember.js特性的源码解读
+
+	计算属性
+	订阅
+	双向绑定
+	container容器
+	runloop
+	ember-data 数据持久化
+
+3.Ember.js应用分析
+
+	几个模块的加载分析
+
+	Application
+	Route
+	Controller
+	View
+	Model
+	Template
+
+4.实例运用
