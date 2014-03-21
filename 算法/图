@@ -1,0 +1,111 @@
+#图
+===
+
+###图的基本概念
+
+顶点(Vertex)
+边(Edge)
+无向图(Undigraph)
+	连通图(图中任意两个丁点都是连通的)
+	非连通图
+	连通分量(无向图中的极大连通子图)
+有向图()
+	强连通图
+	强连通分量
+完全图
+稀疏图
+稠密图
+权
+子图
+回路/环
+
+最小生成树:
+	极小连通子图，但是包含全部顶点
+
+
+### 常用存储结构
+存储结构跟具体的算法关系很大，不同的算法根据不同的存储类型。
+
+####邻接矩阵
+其实就是数组表示发，N^2
+
+####邻接表
+链式表示法
+对每个顶点简历一个单链表，每一个next都是与其相邻的顶点
+
+####邻接多重表
+类似十字链表
+每个顶点，做为一个头结点
+每个边做为一个结点
+跟每个顶点相关的边链接成一个链表
+一个边可能存在于多个链表中
+
+
+## 基本算法
+
+####深度优先算法(Depth_First Search)-BFS
+
+以邻接矩阵查找时，O(N^2)
+以邻接表查找时，O(N+E)
+
+	var visited = {},
+		graph = {
+			A:['B'],
+			B:['C','D'],
+			C:['B'],
+			D:['C']
+		}
+
+
+	for(var key in graph){
+		if(!visited[key]){
+			dfs(graph,key);
+		}
+	}
+
+	var dfs = function(graph,vex){
+		visited[vex] =true;
+		console.log(vex);
+		for(var j=0;j<graph[vex].length;j++){
+			if(  !visited[graph[vex][j]]){
+				dfs(graph,graph[vex][j]);
+			}
+		}
+	}
+
+####广度优先算法(Breadth_First Search)-BFS
+纠结了很久，原来用队列，先进先出来可以解决。
+如果这样的话，那深度优先遍历应该可以用非递归来实现，使用栈，先进后出来实现.
+	var visited = {},
+            next=[],
+            graph = {
+                A:['B'],
+                B:['C','E'],
+                C:['B'],
+                D:['C','E'],
+                E:['D']
+            };
+
+    visited.A =true;
+    console.log('A');
+    next.push('A');
+    while(next.length){
+        var vex =next.shift();
+        for(var j=0;j<graph[vex].length;j++){
+            if(!visited[graph[vex][j]] ){
+                visited[graph[vex][j]]=true;
+                console.log(graph[vex][j]);
+                next.push(graph[vex][j])
+            }
+        }
+    }
+    
+
+####拓扑排序
+对有向无回路图 进行排序，本质就是根据依赖关系来排序
+
+
+
+
+
+
