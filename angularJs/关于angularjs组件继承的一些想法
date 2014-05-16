@@ -1,0 +1,6 @@
+关于angularjs组件继承的一些想法
+
+1.angular组件继承可以利用的地方:
+	$scope,这个有十分完善的继承关系--可以利用
+	link，
+	compile

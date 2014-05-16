@@ -1,0 +1,246 @@
+###angularjs moduleload模块
+===
+也就是angular.module,drect...filter 等...
+src/loader.js
+这个js也即时angular的全局loader模块，提供angularjs module，API，angularjs的基本入口都是这个函数
+
+###1.ensure
+这个方法挺实用的··
+先判断obj上name是否存在，如果不存在，则obj[name] = factory()，
+也就是说提供工厂方法来生成对应的属性,
+整个load模块，都过ensure 层层嵌套来确实比较巧妙，可以借鉴的一种方式（貌似现在这种方式都比较流行，backbone的对象模式太格式化了）
+	
+	function ensure(obj, name, factory) {
+	    return obj[name] || (obj[name] = factory());
+	  }
+
+###2.注册module到angular 对象上
+	其实，就是设置angular的module函数，这里通过闭包的形式，来访问modules变量，
+	这种方式来处理这种情况，确实比较轻松，通过闭包 加一个函数 来实现一个简单的。。
+	ensure(angular, 'module', function() {
+	    /** @type {Object.<string, angular.Module>} */
+	    var modules = {};
+	    return function module(name, requires, configFn) {
+	    	...
+	    }
+	 })
+
+	这里之前关于闭包里面的变量的是否是固定有点疑问，
+	比如这里的：
+		var modules = {};
+		内层的:var invokeQueue = [];var configBlocks = [];
+	在整个angular全局，var modules，只会执行一次
+	而，var invokeQueue,var invokeQueue,再每个module的工厂方法里面，只会执行一次，故对于每个moule而言是唯一的
+	reutrn{};这种其实 跟 var unname = ｛｝；reutrn unname 是一个道理，
+	总结：这个疑惑的解决根源就是 var的执行次数.
+
+
+###3.module的工厂方法:
+	为何不直接返回moduleInstance对象呢?
+	
+	之前设计类的时候，经常出现这种问题，对于不属于类本身的方法，但是又是一些通用方法，怎么处理呢？
+	这种模式就很好的解决了这个问题，---so nice
+
+	例如：invokeLater方法，按理说不属于这个类的方法，所以在函数内部，类定义外面，这样就很好的解决了这个问题，首先，让类的结构
+	更加清爽，其次对于类的安全性也更高
+
+
+	在仔细想下：为啥invokeQueue，configBlocks，为何定义在moduleInstance的外面，？
+		当然有可能是因为moduleInstance外面的一些方法可能用到，
+		那么就算moduleInstance被强制修改了这些属性，那么对外面的属性的使用，毫无影响，从某个角度来说 这样安全性更高，
+	再回过头来想下，这种模式的弊端是什么呢？ 返回的实例直接是一个object，这样很难对其做多层级的原型继承，也很难做类型标志，也就是说对继承的支持不够完美，
+	不过对于一些系统的核心类，或者相对固定的封闭的类，也就不需要完善的继承支持了（这句待斟酌）。
+
+	总结:javascript不存在 prvata public 等语法上对属性或者方法的限制，那么如果实现呢，如何合理的实现开闭原则呢，
+		就是通过灵活的运用闭包原则，以及函数内部的定义的变量来实现
+		这种模式的特点就是 api简洁，安全，封闭 ，对于一些系统的核心类或者固定的功能比较合适
+
+	再想想 有没有可能存在， 既安全 又支持完美继承 又简洁的模式呢？---有空意淫
+
+###4.invokeLater函数
+
+	module的绝大部分功能函数，都是这个函数，invokeLater执行的结果，返回结果就是return moduleInstance, so angularjs模块，等支持链式的写法
+
+	每个功能函数 真正的函数其实是这个，可以看到所有的执行调用都被放入到 queue(每个模块invokeQueue，或者传入queue),都不是立即执行··具体什么时候执行呢？
+		function() {
+            queue[insertMethod || 'push']([provider, method, arguments]);
+            return moduleInstance;
+          }
+
+
+###5.总结
+	
+	细节设计···so beautiful··
+	
+
+
+
+
+源码如下：
+
+	function() {
+        if (!requires) {
+          throw $injectorMinErr('nomod', "Module '{0}' is not available! You either misspelled " );
+        }
+        /** @type {!Array.<Array.<*>>} */
+        var invokeQueue = [];
+        var configBlocks = [];
+        var runBlocks = [];
+        var config = invokeLater('$injector', 'invoke', 'push', configBlocks);
+        var moduleInstance = {
+          _invokeQueue: invokeQueue,
+          _configBlocks: configBlocks,
+          _runBlocks: runBlocks,
+          requires: requires,
+          name: name,
+          provider: invokeLater('$provide', 'provider'),
+          factory: invokeLater('$provide', 'factory'),
+          service: invokeLater('$provide', 'service'),
+          value: invokeLater('$provide', 'value'),
+          constant: invokeLater('$provide', 'constant', 'unshift'),
+          animation: invokeLater('$animateProvider', 'register'),
+          filter: invokeLater('$filterProvider', 'register'),
+          controller: invokeLater('$controllerProvider', 'register'),
+          directive: invokeLater('$compileProvider', 'directive'),
+          config: config,
+          run: function(block) {
+            runBlocks.push(block);
+            return this;
+          }
+        };
+
+        if (configFn) {
+          config(configFn);
+        }
+        return  moduleInstance;
+        function invokeLater(provider, method, insertMethod, queue) {
+          if (!queue) queue = invokeQueue;
+          return function() {
+            queue[insertMethod || 'push']([provider, method, arguments]);
+            return moduleInstance;
+          };
+        }
+      })
+
+
+
+
+
+
+	function setupModuleLoader(window) {
+
+	  var $injectorMinErr = minErr('$injector');
+	  var ngMinErr = minErr('ng');
+
+	  function ensure(obj, name, factory) {
+	    return obj[name] || (obj[name] = factory());
+	  }
+
+	  var angular = ensure(window, 'angular', Object);
+
+	  // We need to expose `angular.$$minErr` to modules such as `ngResource` that reference it during bootstrap
+	  angular.$$minErr = angular.$$minErr || minErr;
+
+	  return ensure(angular, 'module', function() {
+	    /** @type {Object.<string, angular.Module>} */
+	    var modules = {};
+
+	    
+	    return function module(name, requires, configFn) {
+	      var assertNotHasOwnProperty = function(name, context) {
+	        if (name === 'hasOwnProperty') {
+	          throw ngMinErr('badname', 'hasOwnProperty is not a valid {0} name', context);
+	        }
+	      };
+
+	      assertNotHasOwnProperty(name, 'module');
+	      if (requires && modules.hasOwnProperty(name)) {
+	        modules[name] = null;
+	      }
+	      return ensure(modules, name, function() {
+	        if (!requires) {
+	          throw $injectorMinErr('nomod', "Module '{0}' is not available! You either misspelled " +
+	             "the module name or forgot to load it. If registering a module ensure that you " +
+	             "specify the dependencies as the second argument.", name);
+	        }
+
+	        /** @type {!Array.<Array.<*>>} */
+	        var invokeQueue = [];
+
+	        /** @type {!Array.<Function>} */
+	        var configBlocks = [];
+
+	        /** @type {!Array.<Function>} */
+	        var runBlocks = [];
+
+	        var config = invokeLater('$injector', 'invoke', 'push', configBlocks);
+
+	        /** @type {angular.Module} */
+	        var moduleInstance = {
+	          // Private state
+	          _invokeQueue: invokeQueue,
+	          _configBlocks: configBlocks,
+	          _runBlocks: runBlocks,
+
+	         
+	          requires: requires,
+
+	         
+	          name: name,
+
+
+	          
+	          provider: invokeLater('$provide', 'provider'),
+
+	         
+	          factory: invokeLater('$provide', 'factory'),
+
+	         
+	          service: invokeLater('$provide', 'service'),
+
+	        
+	          value: invokeLater('$provide', 'value'),
+
+	          
+	          constant: invokeLater('$provide', 'constant', 'unshift'),
+
+	          
+	          animation: invokeLater('$animateProvider', 'register'),
+
+	          
+	          filter: invokeLater('$filterProvider', 'register'),
+
+	         
+	          controller: invokeLater('$controllerProvider', 'register'),
+
+	          
+	          directive: invokeLater('$compileProvider', 'directive'),
+
+	          
+	          config: config,
+
+	          
+	          run: function(block) {
+	            runBlocks.push(block);
+	            return this;
+	          }
+	        };
+
+	        if (configFn) {
+	          config(configFn);
+	        }
+
+	        return  moduleInstance;
+
+	        function invokeLater(provider, method, insertMethod, queue) {
+	          if (!queue) queue = invokeQueue;
+	          return function() {
+	            queue[insertMethod || 'push']([provider, method, arguments]);
+	            return moduleInstance;
+	          };
+	        }
+	      });
+	    };
+	  });
+
+	}

@@ -4,3 +4,15 @@ BUG记录
 	alert('')
 	代码调试到这行的时候，竟然进入textarea的focus事件，
 	而focus事件里面 使用textarea的select方法，select方法ie9中隐藏状态下 会抛出函数不正确的错误
+
+2.over-flow:hidden,以及 display:inline-block 导致的 baseline的问题
+	有空的时候查阅一下
+
+	另外，浮动元素与 块状元素 以及 内联元素 是如何 在一个 容器里面的布局的？ 
+
+
+3.CSS事件的触发顺序
+	click事件之后，才触发 blur事件， 事件的触发顺序问题
+
+
+4.jquery的深克隆，attrs的toJSON中包含了collection结构，deep clone无效。 jquery的克隆对这种复杂的对象 如何处理呢？

@@ -1,0 +1,100 @@
+指令中的scope继承问题
+
+一。scope的取值有如下几种方式:
+1.true,
+	创建了一个新的节点，而且当前结点原型继承于父结点
+
+2.false
+	scope就是父scope，默认情况就是false,
+
+3.{}
+	创建一个新的scope，并且不继承scope。
+
+以上3中方式，虽然对父scope的继承不一样，但是都可以拥有$parent,
+也就是说，虽然不同的方式原型继承不一样，但是呢，都可以通过$parent访问到父scope
+
+===
+这里要注意，大部分情况要隔离scope吧··
+
+
+二。link中的scope跟以上三者的关系
+
+经测试一样···
+
+三。link中 element.scopt()取到的scope在上面三种情况如果
+
+	如下情况中，element.scope 不等于controller中的$scope,但是等于$scope.$parent;
+	why?
+
+		link:function(scope,element,attr){
+            console.log('link scope is equal ctrl scope :'+(cache===element.scope()));
+        },
+        scope:false
+
+四。指令scope:{},时的三种取值
+scope:{
+        isolatedAttributeFoo:'@attributeFoo',
+        isolatedBindingFoo:'=bindingFoo',
+        isolatedExpressionFoo:'&'
+    }        
+    <my-component attribute-foo="{{foo}}" binding-foo="foo" 
+        isolated-expression-foo="updateFoo(newFoo)" >
+
+    1.第一种@,情况，
+    	如果当前作用域的值改变，则父作用域的值不改变
+    	如果父作用域对应的值改变，则当前作用域不改变
+    2.第二种情况,=
+    	双向绑定，任意一方改变都会导致另外一方改变
+    3.第三种情况,直接将属性包成函数，
+    	这个一般都是函数继承的方法，也就是说如果子作用域需要父作用域的函数，可以通过这种方式来设置
+
+ 当然，以上三种情况，都是在scope：｛｝，的前提下.
+ http://jsfiddle.net/maxisam/QrCXh/
+
+五。指令的Transclude(尼玛终于看明白了)
+	
+	参考:http://www.angularjs.cn/A0pU
+
+	三种设置:1.不设置，2.true，3.element [true,只是将指令的内容，而element，是将整个整理的div都做为内容]
+
+	用法1：这个指令的作用基本就是将指令内部的子结点，包含到指令模板特点的结点内（ngTransclude）
+	用法2: 在指令的compile函数中，会加一个transcludeFn,这个函数其实就是link函数，link之后就得到结点了，然后这样就你想干嘛就干嘛了
+		注意：transcludeFn有两种用法
+
+	关于Transclude那部门的作用域，默认情况下，他会新建一个跟当前指令的兄弟作用域，但是呢，你可以在上面两个用法中指定作用域
+
+		A:var content = transclude(scope);,当作link函数，直接返回dom
+		B.,这种用法也是一样的，指定作用域，然后在里面操作dom。
+		tranclude(scope,function(clone){
+        	elem.append(clone);
+    	 })
+
+	app.directive('showLength', function($rootScope, $document){
+    var func = function(element, attrs, link){
+  
+      return function(scope, ielement, iattrs, controller){
+        var node = link(scope);
+        ielement.append(node);
+        var lnode = $('<span></span>');
+        ielement.prepend(lnode);
+  
+        scope.$watch(function(scope){
+          lnode.text(node.text().length);
+        });
+      };
+    }
+  
+    return {compile: func,
+            transclude: true, // element是节点没,其它值是节点的内容没
+            restrict: 'A'};
+  });
+
+  Transclude，的一个坑，
+    如果默认方式，也就是说通过ng-指令的方式，那么内部的html的scope其实是父scope的继承子指令
+    这样在很多情况下可能有问题，要改变scope，则需要在compile中通过cludelink传入scope去指定这个scope
+
+
+
+
+
+

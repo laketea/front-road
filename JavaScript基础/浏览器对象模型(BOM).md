@@ -152,6 +152,8 @@ window.frames,如果页面包含框架，则每个框架里的页面的window包
 	注意：每个框架都有自己的一套构造函数，这些构造函数一一对应，但是并不相等。
 	top.Object 不等于 top.frames[0].Object, 主要影响到instanceof操作符
 
+//一种获取iframe window的方式
+this.$("iframe")[0].contentWindow
 
 	
 ## 四.navigator
@@ -185,8 +187,9 @@ history对象保存用户上网的历史记录（当前窗口）。开发人员�
 
 
 
-                          
-                                                                                                          
+                         
+ 
+                                                                                                          
 	
 	
 

@@ -1,0 +1,51 @@
+###angularjs
+
+===
+src/angular.js
+这个主要是angular的一些常用函数
+
+nextUid:产生一些数字和字符串混合的唯一ID
+setHashKey(obj, h）:$$hashKey
+extend(dst,a,a...):浅复制
+
+inherit(parent, extra):继承
+	这个写法很简洁，原型继承，下面来分解：
+	1.匿名函数 function(){};
+	2.函数的prototype设置为parent， extend(function(){},{prototype:parent})
+	3.函数实例化，new (...)
+	4.继承extra到新的对象上。
+	function inherit(parent, extra) {
+	  return extend(new (extend(function() {}, {prototype:parent}))(), extra);
+	}
+
+noop，空函数···主要是为了方便函数不存在时，|| noop
+
+identity:跟上面类型，只是这个返回第一个参数
+	function identity($) {return $;}
+
+valueFn:包了一层函数来返回value
+	{return function() {return value;};}
+
+isUndefined：
+isDefined：是否定义
+
+isObject：判断是否object，不包含null的情况
+
+isString,
+
+isNumber,
+
+isDate,	//toString.call(value) === '[object Date]';
+
+isArray://toString.call(value) === '[object Array]';
+isFunction
+isRegExp
+isWindow
+isScope
+isBoolean
+
+angular.copy:深克隆，
+	 $scope.master= angular.copy(user);
+	 angular.copy($scope.master, $scope.user);
+
+angular.equals(01,02);//普通对象或数组，如果具体的属性都相等则相等，widnow或者scope 仅做===比较

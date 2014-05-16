@@ -1,0 +1,123 @@
+$scope
+
+$compile: 这块是对dom里面的表达式建立watch，并且并且自动设置applyapply，进入dirst处理
+
+$link:这一块实际上是 对watch的里面 scope进行链接，所以如果在这一步添加 表达式，是无法正常显示的
+
+$apply:这个函数的作用呢，是触发 系统进行 digest检测，如果脏值检查，如果是在编译期
+
+
+1.基本实现:
+
+	$scope.prototype.$$watchers = [];//存储所有的监控函数以及监听函数
+	$scope.prototype.$$asyncQueue =[];//存储列入计划中的任务
+	$scope.prototype.$$phase = null;//存储当前作用域的执行阶段
+
+	//watchFn,这个是监控函数，监控函数可以用系统生成，用来检测函数的最新的值
+	//listenFn,这个是监听函数，监听函数也就是在检查到属性改变时，调用的函数
+	$scope.prototype.$watch = function(watchFn,listenFn){
+
+		var watch = {
+			watchFn:watchFn,
+			listenFn:listenFn
+		}
+		this.$$watchers.push(watch);
+
+		//返回一个函数，这个函数执行的话，就会销魂这个 监听器，··这个返回的方式看起来很不错···节约api啊，不然的话，就又得在$scope的上面添加一个销魂的方法，very nice
+		return function() {
+		    var index = self.$$watchers.indexOf(watcher);
+		    if (index >= 0) {
+		      self.$$watchers.splice(index, 1);
+		    }
+		  };
+	}
+
+
+	//$digestOnce其实就是，循环检查watchers，如果发现值改变了则调用listenFn。	
+	$scope.prototype.$digestOnce = function(){
+
+		var self = this;
+		var dirty ;
+		_.forEach (this.$$watchers,function(watch){
+			var newValue = watch.watchFn(self);
+			var oldValue = watch.oldValue;
+			if(newValue!==oldValue){
+				watch.listenFn(newValue,oldValue,self);
+				dirty = true;
+			}
+			watch.last = newValue;
+		});
+
+		return dirty;
+	}
+
+	//之所有这样，是因为在listenfn也可能会修改监控的某个属性，这样如果只运行一次digest，那么有可能有些改变就无法检测到，
+	//所以每次运行完一轮，就再一次做检测，直到检测到所有监控的属性都没有改变
+	//加入ttl,是因为 如果两个监听器互相改变对放检测的值，那么会导致无线循环，所以设置ttl，超过10次，则stop
+	$scope.prototype.$digest = function(){
+		var dirty;
+		var ttl = 10;
+		this.$beginPhase('$$digest');
+		do{
+		//这一块呢，假如脏值检测之前后当前检测之后，如果还是脏的，则先运行延迟的函数
+			while(this.$$asyncQueue.length){
+				this.$eval(this.$$asyncQueue.shift().expression);
+			}
+
+			dirty = this.$$digestOnce();
+			if (dirty && !(ttl--)) {
+		      throw "10 digest iterations reached";
+		    }
+		}while(dirty);
+		this.$clearPhase();
+	}
+
+
+	//这个函数的作用显而易见了··就是执行完这段代码，然后掉digest,脏值检测
+	$scope.prototype.$apply = function(expr){
+		
+		try{
+			this.$beginPhase("$apply");
+			return this.$eval(expr)
+		}finally{
+			this.$clearPhase();
+			this.$digest()
+		}
+	}
+
+	//这个具体何用？ 实际应用场景，还不是很理解，主要的作用就是改变函数的运行周期，放在digest内部，也就是放在下一次digest的之前运行，这样有合用处呢··，保证改变会被digest检测到？ 但是也不是里面检测··
+	$Scope.prototype.$evalAsync = function(expr) {
+		//靠，终于知道为啥要这样做了，
+		//判断当前是否有任务执行，如果没有，那么setTimeout显示的执行一次$digest,这里判断queue的长度，是因为只要加入了这会调用，那么如果已经加入过sync方法，则不需要settimeout digest
+		var self = this;
+		  if (!self.$$phase && !self.$$asyncQueue.length) {
+		    setTimeout(function() {
+		      if (self.$$asyncQueue.length) {
+		        self.$digest();
+		      }
+		    }, 0);
+		  }
+
+	  this.$$asyncQueue.push({scope: this, expression: expr});
+	};
+
+	//设置开始执行阶段
+	$Scope.prototype.$beginPhase = function(phase) {
+	  if (this.$$phase) {
+	    throw this.$$phase + ' already in progress.';
+	  }
+	  this.$$phase = phase;
+	};
+
+	//清除执行状态
+	Scope.prototype.$clearPhase = function() {
+	  this.$$phase = null;
+	};
+
+
+
+
+三。总结:
+	这种循环检测监听器的方式，确实感觉效率不高，为何不直接用set，get，
+	不过，用set，get毕竟会对$scopde的属性污染，而且取数据以及访问数据都必须通过特点的接口来，没有对POJO操作那么简单就是，如果能排除效率的问题，
+	这种方式，比get set要更好些把··
