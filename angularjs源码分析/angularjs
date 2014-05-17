@@ -49,3 +49,53 @@ angular.copy:深克隆，
 	 angular.copy($scope.master, $scope.user);
 
 angular.equals(01,02);//普通对象或数组，如果具体的属性都相等则相等，widnow或者scope 仅做===比较
+angular.bind(context,fn);//绑定函数的作用域，实现原理很简单，返回函数并不是原始函数，而是包了一层函数，然后在这个包的函数里面，
+						调用原始函数 orignFn.call(self)
+
+angular.toJson(obj,pretty) 
+json的序列号，专门用来处理angular中的数据，
+因为angular会对原始数据添加一些带￥的属性，用这个函数会自动把angularjs的特有属性清除掉
+
+angularinit 这个方法比较简单，查找 ng:app,...等app属性的dom，并且找到配置的module，然后bootstrap
+从文档来看，angularjs支持多个app，但是多个app之间不允许嵌套,angular只会把找到的第一个app当作rootapp，
+如果定义了多个app，则其他的app必须手动bootstrap
+
+
+angular.bootstrap(element,modules,config)
+	
+	1.判断对应的dom是否已经injector过，如果是则err
+	2.在modules数组的签名自动加入两个模块,
+		ng，
+		还有一个匿名模块:$provide.value('$rootElement', element);
+	3.通过modules创建一个包装器类 injector, 具体的函数写在 src/auto/injector.js （后面再仔细分析）
+	4.调用injector.invoker 方法，并返回injector，
+	  看这个方法的内部应该知道，这个就是真正的编译入口出了，
+	  这个invoke的方法，应该主要是封装一些依赖注入的操作。
+
+		injector.invoke(['$rootScope', '$rootElement', '$compile', '$injector', '$animate',
+	       function(scope, element, compile, injector, animate) {
+	        scope.$apply(function() {
+	          element.data('$injector', injector);
+	          compile(element)(scope);//模板解析的全局入口
+	        });
+	      }]
+	    );
+
+bindJQuery() //angularjs 自带一个jquery的lite版本的狠心功能，jqLite
+ 这个函数主要是判断用户是否加载了jquery，如果加载了则使用jquery，否则使用jqLite，
+ 从代码看，使用用户的jquery，也继承了一些jqLite的方法，这些方法主要是处理angluarjs相关的一些反射，控制器，作用域指令的··
+
+ 	extend(jQuery.fn, {
+      scope: JQLitePrototype.scope,
+      isolateScope: JQLitePrototype.isolateScope,
+      controller: JQLitePrototype.controller,
+      injector: JQLitePrototype.injector,
+      inheritedData: JQLitePrototype.inheritedData
+    });
+
+    另外还重写了jqueryCleardata方法，注释来看，jquery remove元素都是通过这个方法来好实现
+    这里的扩展主要是在删除dom之前，在每个dom上的$destor事件，应该是用来做一些清理工作把
+
+
+
+

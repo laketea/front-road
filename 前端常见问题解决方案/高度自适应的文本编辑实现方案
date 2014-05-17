@@ -1,0 +1,33 @@
+#宽高自适应的文本编辑实现方案
+
+===
+
+高度自适用的需求有两种情况，
+1.一种是类似邮件收件人输入框，长度上自使用
+2.另外一种是 高度自适应的 文本编辑框
+
+### 宽度自适应的文本编辑框
+
+外层div的设置未float，min-width 或者auto，
+inline-text设置为 visibility:hidden,这样这个span不显示，但是会占据位置，所有会把外层容器自动撑高
+input 设置为absoulate布局，四个方向距离都会0，这样外层容器变大，则这个input自动变大
+
+input设置change事件，如果value改变，则把值赋span的html里面，这样容器自动撑大，input也跟着自动变宽
+
+	<div class="form-input-block form-block" style="/* display: none; */">
+		<input type="text" class="from-base-ipt"> 
+		<span class="inline-txt">123123123123123</span>
+	</div>
+
+
+### 高度自适应的文本编辑框
+
+用html5的contenteditable可编辑属性来实现
+	1.使用span(inlin-block)做为编辑dom，完美解决自动扩展的问题，无任何多余的操作
+	2.如果 style= block,的元素，做为编辑dom，则内部换行会在内部新生成一个div
+	3.如果 stype= inline / inline-block 的元素做为编辑dom，则内部换行 加 一个br/
+一个奇葩的问题，如果设置了max-height，而又没有设置overflow属性，那么在内部长度超出max-height的时候，
+选中边框根据内部的边界来，看起来就比较怪异了，所有最好设置overflow属性
+
+so，另外一种方法，使用textarea，对回车事件做处理，这个方案的问题是 必须精确计算textarea每一行的高度，
+而且对于删除行的问题不好处理。。。。
