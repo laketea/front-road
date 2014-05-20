@@ -34,6 +34,27 @@ src/loader.js
 	reutrn{};这种其实 跟 var unname = ｛｝；reutrn unname 是一个道理，
 	总结：这个疑惑的解决根源就是 var的执行次数.
 
+	angular module 有三个队列:
+
+	_invokeQueue:
+		这几个方法用的都是这个队列
+		directive,
+		controller,
+		filter,
+		animation,
+		constant,
+		value,
+		service,
+		factory,
+		provider
+	_configBlocks:
+
+		config:invokeLater('$injector', 'invoke', 'push', configBlocks);
+		以及参数中的configFn 
+	_runBlocks:
+		run 传入的方法会被定义放入block
+		run:runBlocks.push(block);
+
 
 ###3.module的工厂方法:
 	为何不直接返回moduleInstance对象呢?

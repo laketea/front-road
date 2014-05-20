@@ -3571,6 +3571,7 @@ function createInjector(modulesToLoad) {
     if (!provider_.$get) {
       throw $injectorMinErr('pget', "Provider '{0}' must define $get factory method.", name);
     }
+    console.log('cache providerCache:'+name + providerSuffix)
     return providerCache[name + providerSuffix] = provider_;
   }
 
@@ -3643,6 +3644,7 @@ function createInjector(modulesToLoad) {
                   module, e.stack || e.message || e);
       }
     });
+      console.log('runBlocks'+runBlocks.length)
     return runBlocks;
   }
 

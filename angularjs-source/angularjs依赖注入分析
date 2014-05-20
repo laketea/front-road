@@ -1,1 +1,104 @@
 angularjs依赖注入分析
+===
+
+
+1.启动分析
+
+	1.绑定jquery，处理jquery与jqlit
+
+	2.publishExternalAPI(angular)
+	加载anguljar，将共用方法复制到angular上面
+	初始化angular的模块加载器,并返回angularModule,也就是angular.module方法
+	然后定义ng模块
+
+
+	这一步完成后，开始启动app bootstrap
+	3.angular.bootstrap
+
+	modules.unshfit('ng');--这个是ng默认的模块
+	modules.unshfit()..
+	$provide.value('$rootElement', element);设置rootElement
+
+	默认模块需要加载这些依赖
+
+	4.createInjector(modulesToLoad)，创建注射器。
+	  从目前的源码来看一个bootstrap创建一个注射器，而在这个注射器的里面，会缓存所有的provide以及对应的实例。
+	  从这点来看的话，不同app模块直接的服务 指令等是不可共享的，至于不同app之间如何交互，目前还没看到
+
+	  这个方法里面建立了两个Injector，
+
+	  1）。一个是 providerInjector,对应的容器对象是:providerCache
+	  	这个容器默认提供了最核心的$provide,其内部的五个方法 都是提供缓存的方法
+		  	providerCache = {
+		        $provide: {
+		            provider: supportObject(provider),
+		            factory: supportObject(factory),
+		            service: supportObject(service),
+		            value: supportObject(value),
+		            constant: supportObject(constant),
+		            decorator: decorator
+		          }
+		      },
+
+		下面来分析这5个provide:
+			provider是最基本的形式，其他的方法都会调用这个函数
+
+			A.provider:从代码可以看出,proverder_函数可以有多种写法，函数，数组，或者对象
+				如果是函数或者数组（里面显式的写了依赖），则会实例化这个函数，
+					实例化的过程，其实就是代理原型继承，再在新对象上执行构造函数，如果函数return 了对象或者函数，则return的对象为 最终的provide，否则则以新建的对象实例为provide
+					（这样处理非常巧妙）
+						  instance = new Constructor();
+					      returnedValue = invoke(Type, instance, locals, serviceName);
+					      return isObject(returnedValue) || isFunction(returnedValue) ? returnedValue : instance;
+				得到实例化后的对象后，要判断对象是否有$get,因为$get是一个非常关键的属性，这个$get 就是provide的工厂方法，所有provide都是通过这个$get来生成实例对象,
+				最后缓存进:providerCache [name + providerSuffix] //所有的provide都会添加一个后置
+
+			B.facotry 这个比较简单，也就是直接提供$get工厂方法
+				function factory(name, factoryFn) { return provider(name, { $get: factoryFn }); }
+
+			C.service 直接调用factory，给出默认的工厂方法，传入的constructor直接被实例注射器初始化
+				function service(name, constructor) {
+				    return factory(name, ['$injector', function($injector) {
+				      return $injector.instantiate(constructor);
+				    }]);
+				  }
+			D.value:其实就是定义常量，
+				function value(name, val) { return factory(name, valueFn(val)); }
+			E.constant:也是常量，直接定义到cache对象上，
+				从代码上看，使用了这个方法后，立即可用
+				providerCache[name] = value;
+    			instanceCache[name] = value;
+    		F:decorator
+    			这个方法 就是重新装饰现有provide的功能，也可以说是修改。
+    			也就是重新定义一个provide的$get函数，而在新的函数中可以获取到旧的实例对象
+    			 origProvider.$get = function() {
+				      var origInstance = instanceInjector.invoke(orig$get, origProvider);
+				      return instanceInjector.invoke(decorFn, null, {$delegate: origInstance});
+				    };
+
+
+
+
+
+				function provider(name, provider_) {
+				    assertNotHasOwnProperty(name, 'service');
+				    if (isFunction(provider_) || isArray(provider_)) {
+				      provider_ = providerInjector.instantiate(provider_);
+				    }
+				    if (!provider_.$get) {
+				      throw $injectorMinErr('pget', "Provider '{0}' must define $get factory method.", name);
+				    }
+				    console.log('cache providerCache:'+name + providerSuffix)
+				    return providerCache[name + providerSuffix] = provider_;
+				  }
+
+
+	  2）。另外一个是instanceInjector,对应的容器对象是:instanceCache
+	  		instanceCache 方法主要是提供实例化的对象的容器，也就是provideCache中的provide的$get 工厂方法 生成的对象实例
+
+	5.loadModule分析
+
+
+
+
+
