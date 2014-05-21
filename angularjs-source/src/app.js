@@ -26,3 +26,7 @@ app.service('serviceTest',function(){
     this.test = 'test';
 })
 
+var ff =angular.module('test-other', [],function(){
+    console.log('test-other module');
+});
+

@@ -37,6 +37,13 @@ angularjs依赖注入分析
 		            value: supportObject(value),
 		            constant: supportObject(constant),
 		            decorator: decorator
+		          },
+		          $injector:{//这个对象也就是providerInject 也就是privider核心注入器对象
+		          	invoke: invoke,
+				    instantiate: instantiate,
+				    get: getService,
+				    annotate: annotate,
+				    has: function(name) {
 		          }
 		      },
 
@@ -76,6 +83,7 @@ angularjs依赖注入分析
 				      return instanceInjector.invoke(decorFn, null, {$delegate: origInstance});
 				    };
 
+			这个6中类似的方法 具体用途如何用，还需要参考ng已有的模块，仔细的研究
 
 
 
@@ -97,6 +105,175 @@ angularjs依赖注入分析
 	  		instanceCache 方法主要是提供实例化的对象的容器，也就是provideCache中的provide的$get 工厂方法 生成的对象实例
 
 	5.loadModule分析
+
+		loadModule,这里用了递归调用
+
+		1.首先分析每个loadModule函数里面做的事情:
+			A）。如果module,isString,获取对应的moduleFn;
+				1).合并当前模块以及依赖的子模块的_runBlocks；因为每个loadModules返回的是runBlock吗所以这里会导致递归调用。
+					runBlocks = runBlocks.concat(loadModules(moduleFn.requires)).concat(moduleFn._runBlocks);	
+
+				2).遍历执行当前模块所有的_invokeQueue,具体如何执行呢？
+					从之前的模块分析那块，可以知道，模块定义的所有指令，服务以及配置fun等，都是存入invokeQueue, 
+					那么也就是在这一步，执行queue里面的具体东西（注意这里并不执行具体controller函数内部的代码）。
+					具体如何调用呢:
+					举例说明:
+						config: '$injector', 'invoke',fn
+						provider:'$provide', 'provider',fn
+						factory: '$provide', 'factory',
+						service: invokeLater('$provide', 'service'),
+						value: invokeLater('$provide', 'value'),
+						directive: invokeLater('$compileProvider', 'directive'),
+						......
+					 invokeArgs的第一个参数：对应为 $provide,也就是具体的$provide ,第二个参数对应为invoke,等，也就是对应的provide的方法
+					 	第三个参数就是用户通过模块API传入的服务或者指令的具体的函数
+
+					 这样分析后，下面两句代码就很清晰了，首先通过参数一也就是provide的名字，通过providerInjector来后去到provide实例
+					 然后呢，method.apply(provide,fn);在对应的provide上调用对应的方法并传入fn参数（也可能为数组，直接依赖注入）
+					 provider = providerInjector.get(invokeArgs[0]);
+					 provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
+					 这一步完成后，module的所有指令，服务啊，指令的都被注册到providerInjector中
+
+			B）。如果module是函数或者数组，则直接runBlocks.push(providerInjector.invoke(module));
+				从 C）中的解析来看，如果module是个函数，那么执行一次就OK了··
+
+			C)..1这里有一点疑问，ng的默认服务指令 provide是怎么注册的呢。
+				 	上面有说到ng模块放在 用户app模块加载之前，ng模块有个 configFn，这个fn里面做了所有默认provider 指令等的注册工作
+				 	层层分析后，ng模块的默认加载函数的执行栈 如下:
+				 		projectInject.invoker(['$provider',function($provider){
+				 			...
+				 			...这里处理所有模块的加载
+				 			...
+				 		}])
+
+				 		invoker方法其实很简单，分析函数的依赖，将依赖注入到函数的参数中，然后调用。
+				 		那么，从这里我们也可以分析出，config中的函数 也经过的工作 也就是 在模块加载的时候，执行一次··然后他的任务就完成了
+				 			onfig: '$injector', 'invoke',fn
+
+	6.projectInject以及instanceInject分析
+
+		1).createInternalInjector分析
+			这个函数有两个参数，一个是cache容器，一个工厂方法。
+			createInternalInjector分析产生一个注入器，其提供如下接口,下面一一来分析
+				{
+			      invoke: invoke,
+			      instantiate: instantiate,
+			      get: getService,
+			      annotate: annotate,
+			      has: function(name) {
+			        return providerCache.hasOwnProperty(name + providerSuffix) || cache.hasOwnProperty(name);
+			      }
+    			};
+
+    		1.1）get.从名字上理解也比较简单，就是从容器去get对应的对象
+    			{{这里有个判断循环依赖的方法:也就在get过程中，cache中每个name为查找状态，如果查找过程中，发现有正在查找的对象，则说明循环依赖}}
+    			这个函数比较简单，首先从当前cache中查找对应name的对象，如果没有则从工厂中获取,顶层函数中的factory方法在这里就有了用途了
+
+    			对于providerInjdect中，可以说是没有真正的工厂方法，他的工厂方法只是抛出一个错误
+    				function() {
+			            throw $injectorMinErr('unpr', "Unknown provider: {0}", path.join(' <- '));
+			          })
+			    对于instanceInjector,工厂方法 则是通过poviderInject获取provider实例，然后通过instancInjecor调用。
+			    	function(servicename) {
+			            var provider = providerInjector.get(servicename + providerSuffix);
+			            return instanceInjector.invoke(provider.$get, provider);
+			          })
+			    从这个工厂方法以及后续的代码，可以看出来，angularjs里面所有注册的模块service ，controller等，默认都是没有初始化，只有在真正依赖注入需要的时候，才会进行第一次初始化，这个初始化其实，就是这个工厂方法干的事情，
+			    	if (cache.hasOwnProperty(serviceName)) {
+				        if (cache[serviceName] === INSTANTIATING) {
+				          throw $injectorMinErr('cdep', 'Circular dependency found: {0}', path.join(' <- '));
+				        }
+				        return cache[serviceName];
+				    }else{
+				    	cache[serviceName] = factory(serviceName);
+				    }
+				    从这一行代码，可以看出，所有provider的$get函数，都是只执行一次，然后就缓存到cache中，(这个cache是instance的cache，也就是应用真正的实例cache。 instanceInjector.invoke)
+			    		//，这里有个疑问，如果$get函数执行后不返回结果，那结果岂不一直underfined么	
+			    			不过从另外一个角度来讲，何为工厂方法？ 不就是要返回结果么··
+
+			1.2）invoke 函数，调用执行函数
+
+					首先先分析函数的依赖列表，这里支持多种类型的依赖写法（$inject = annotate(fn)）
+					根据依赖列表 ，取所有的依赖对象，这里分两种情况，如果是provider则取providercache中的，provider，如果是instance，
+					则从instancecache中取，如果cache中，没有则生成一个实例，并放入缓存中
+
+					getService 这里是一个 递归点，假如一种情况，系统第一个执行的模块，分析依赖，找依赖，然后依赖没有找到，就要取生成啊，
+					生成通过invoker来啊，所有这里就是一个递归点
+
+					最后：return fn.apply(self, args);
+
+			1.3）instantiate
+					这个方法，大概就是实例话函数的意思.
+					为什么要这样做呢
+
+					如果直接 new Type,并不一定能保证，返回Type对应的对象，因为 Type也可能是一个工厂方法，如果里面有return，那么返回的完全是另外一个东西
+
+					so，下面这种方法，首先得到 Type 对应的实例对象，当然这个对象也不是真正的 new Type 对象，而是有一个代理，也就是
+					Constructor，通过原型继承来获取继承Type函数的prototype。
+
+					所以这样理解一下后，下面的代码思路就很清晰了。。。
+
+					returnedValue 如果是对象或者函数，则返回这个，否则的化返回instance，
+
+					对应无返回，或者返回对象、函数，好像跟直接在构造函数上new没什么区别，唯一的用途，在于返回其他数据类型，
+					这样难道是避免 返回普通类型，实例化 时，不能将其他数据类型做为实例对象？
+
+
+					Constructor.prototype = (isArray(Type) ? Type[Type.length - 1] : Type).prototype;
+			        instance = new Constructor();
+			        returnedValue = invoke(Type, instance, locals);
+			        return isObject(returnedValue) || isFunction(returnedValue) ? returnedValue : instance;
+
+			     
+
+			1.4） annotate
+				分析函数的依赖
+
+			1.5）判断容器中，是否存在
+
+			总结：
+				1.从invokerz以及instantiate函数可以喊出，对于执行的fn，这两个函数并不会将这个函数注册到cache中，
+			     	这两个函数只是提供注射器的基本功能，执行，但是在寻找依赖的时候，会实例话对应的依赖
+			    2.两个inject的区别？
+			    	代码没有区别，只有参数有区别，cache以及factory
+			    	provide的cache是缓存  $provider
+			    	而instance的cache是缓存 真正的实例对象
+
+			    	provide的寻找依赖只是从当前cache中找，找不到就报错
+			    	而instance寻找依赖从当前cache，如果找不到，那么就通过provide来找到provide，然后实例话，并缓存
+
+			    3.什么时候用 provideInject,什么时候用instaceInject
+			      从第二点的分析来看，就显然意见了。。。。
+			    	注册provide的过程中，用provideInject的方法，
+			    	而运行实例的时候，要用instanceInject 的对应方法
+
+			    5.如何获取 provideInject,instanceInject
+
+			    	在$provide 的环境中，依赖 $$injector
+
+			    	but instanceInject 呢？？？···
+
+			    	再分析···
+
+	7.$provide 的各个方法如何使用 provideInject,以及instanceInject
+
+
+	8._runBlocks 的执行
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

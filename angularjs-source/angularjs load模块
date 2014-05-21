@@ -51,6 +51,8 @@ src/loader.js
 
 		config:invokeLater('$injector', 'invoke', 'push', configBlocks);
 		以及参数中的configFn 
+
+		在最新的版本中，config是放在这里的，但是在旧一点的版本中，config的队列是放在invokeQueue队列中，
 	_runBlocks:
 		run 传入的方法会被定义放入block
 		run:runBlocks.push(block);
