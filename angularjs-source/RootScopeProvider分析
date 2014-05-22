@@ -1,0 +1,111 @@
+#RootScopeProvider
+
+====
+
+每一个app，都有一个单一的rootScope，其他所有的scopes都是root的后代
+
+watch代价比oberver更高
+
+对于provider之前一直不太理解为何要这样设计，从这个源码上看，可以看到一点。
+
+
+在provider中，
+	设置变量，然后暴露出接口来修改， 这个是一种用途，类似类变量的意思吧，可以对
+	对provider设置全局参数
+
+在rootScope里面，
+	定义了变量TTL，也就是最大心跳次数吧，
+
+	this.digestTtl,重设最大心跳次数
+
+再看看核心函数，$get
+
+
+1.以构造器+原型的方式 定义了Scope 类。
+	
+	最后返回了一个 Scope实例，
+	从这点看，这个provider的功能就是返回一个$rootScope,实例cache缓存对应的对象也是$rootScoep
+
+2.Scope主要的变量:
+	
+
+3.$new函数，创建子child
+	
+	3.1 如果是隔离的，也就是 scope ={}的情况，
+		实例话了一个Scope,设置了root，parent
+		asyncQueue
+		postDigestQueue
+		  child = new Scope();
+          child.$root = this.$root;
+          child.$$asyncQueue = this.$$asyncQueue;
+          child.$$postDigestQueue = this.$$postDigestQueue;
+
+    3.2 如果是非隔离，则创建了一个childScopeClass， 然后设置这个class的原型为当前scope
+
+ 4.$watch
+ 	之前有分析过，
+ 	就是将 wathcer加入列表，watch里面还有linstener，也就是更改后执行的函数
+
+ 	最后函数返回一个 函数，执行就清理掉当前函数，对于效率和速度要求高的，需要根据情况来执行
+
+ 	//貌似是linsten Once的意思
+ 	if (typeof watchExp == 'string' && get.constant) {
+          var originalFn = watcher.fn;
+          watcher.fn = function(newVal, oldVal, scope) {
+            originalFn.call(this, newVal, oldVal, scope);
+            arrayRemove(array, watcher);
+          };
+        }
+5.$watchGroup
+	就是监听一组变量，如果期中一个改变，就会触发 listen
+	如何实现呢，对每个变量都watch，然后定义一个count，如果变量改变一次 就count++，
+	然后，真正的watch 监听这个count，改变了就触发，注意参数都是数组形式
+
+			newValues[i] = value;
+            oldValues[i] = oldValue;
+            changeCount++;
+
+            deregisterFns.push(self.$watch(function () {return changeCount;}, function () {
+	          listener(newValues, oldValues, self);
+	        }));
+
+6.$watchCollection，监听对象或者数组的所有属性或者item变化，（浅监听）
+	暂时不了解源码，后面分析，精力有限啊
+
+
+
+7.$digest:脏值检测
+
+	1.第一层循环
+		从代码看，就是不停的判断，有否有脏值，如果里面有一次watch的值改变了，就会设置dirty=false,因为listener内部可能会，再次改变其他地方监听的值。
+		另外第一个循环还有一个操作，就是执行asyncQueue队列中的操作，
+		do { // "while dirty" loop
+          dirty = false;
+          current = target;
+
+          while(asyncQueue.length) {
+            try {
+              asyncTask = asyncQueue.shift();
+              asyncTask.scope.$eval(asyncTask.expression);
+            } catch (e) {
+              clearPhase();
+              $exceptionHandler(e);
+            }
+            lastDirtyWatch = null;
+          }
+
+         } while (dirty || asyncQueue.length);
+    2.第二层循环	深度优先遍历所有的$scope,
+    	a bit crazy
+    	 if (!(next = (current.$$childHead ||
+                (current !== target && current.$$nextSibling)))) {
+              while(current !== target && !(next = current.$$nextSibling)) {
+                current = current.$parent;
+              }
+            }
+          } while ((current = next));
+
+    3.第三层：执行当前scope.$$watchers 检测
+
+
+    $$postDigestQueue,这个就是在执行完检测并且没有脏值的时候，处理这个队列，取出期中的函数并执行，初步看来是 触发$disgest的作用

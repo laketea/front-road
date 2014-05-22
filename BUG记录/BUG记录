@@ -16,3 +16,11 @@ BUG记录
 
 
 4.jquery的深克隆，attrs的toJSON中包含了collection结构，deep clone无效。 jquery的克隆对这种复杂的对象 如何处理呢？
+
+
+
+5.获取所有选中的checkbox
+
+$('#c_b input[type="checkbox"]:checked').each(function() { 
+        $('#t').append(', '+$(this).val());
+    });

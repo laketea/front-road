@@ -253,12 +253,87 @@ angularjs依赖注入分析
 
 			    	but instanceInject 呢？？？···
 
-			    	再分析···
+			    	不同的执行环境，$$injdecotr所获取的依赖对象不一样，
+			    	比如，如果是$provide阶段，你的执行环境是在providerInjector中，
+			    	如果是在最后的实例运行阶段，那么你的执行环境是在instanceInjector中
 
 	7.$provide 的各个方法如何使用 provideInject,以及instanceInject
+		这里再仔细的分析$provide 的真正用途以及与两个inject的关系
+
+		简单点说，大部分$provide 主要是用来实例化$provider，然后放到provide的缓存中（constant有点不态一样）
+			provider_ = providerInjector.instantiate(provider_);
+			providerCache[name + providerSuffix] = provider_;
+
+		那么实例话后的provider 又有什么用途呢？ 在createInjector 的factory参数里面可以看到
+			function(servicename) {
+	            var provider = providerInjector.get(servicename + providerSuffix);
+	            return instanceInjector.invoke(provider.$get, provider);
+	          })
+	    从这段代码可以看到，provider.$get 函数，是真正被instanceInjector实例话调用并缓存的，也就是说，$get对应的函数
+	    的执行环境是instanceInject,里面配置的依赖，都会被注入实例缓存中的对象，
+	    认识清楚了这点，那么对factory与service立交就很清楚了
+
+	    看factory
+	    	function factory(name, factoryFn) { return provider(name, { $get: factoryFn }); }
+	    facotry 也就是直接提供$get,$get会被如何处理呢？ 会被instanceInject invoker，并缓存；
+	    这里就存在一个问题，invoker方法最后一步，只是返回 函数的执行结果，
+
+	    再看service
+	    	function service(name, constructor) {
+			    return factory(name, ['$injector', function($injector) {
+			      return $injector.instantiate(constructor);
+			    }]);
+			  }
+		service又包了一层，函数，其实就是instanceInject.instantiate(constructor);
+			因为instantiate被保证constructor绝对返回constructor的实例对象（也可能被代理）,这样的话，就保证了绝对的单例，而且这个对应的缓存对象是绝对存在的
+
+		再回过头来看看factory
+			return fn.apply(self, args);
+			分两种情况，如果fn执行有返回，那么factory 也是单例并且绝对有缓存对象的，
+			但是如果fn没有返回结果，看下面这句，会导致cache[serviceName] = undefined;
+				cache[serviceName] = factory(serviceName);
+			也许你会认为，这样是没有缓存，but no，再看另外一句代码，get函数里面判断一个对应的cache是否存在，是用下面这句
+				cache.hasOwnProperty(serviceName)
+			so,再结果为缓存对象为undefned的情况下，也是返回true的···
+			so,factory传入的函数，也是只执行一次····再看看invoke的注入操作，这里并没有对undefined处理，也就是说，如果函数没返回，factory缓存的结果永远都是undefined，我们可以写个测试，测试下
+				args.push(
+			          locals && locals.hasOwnProperty(key)
+			          ? locals[key]
+			          : getService(key)
+
+		再总结下：
+			service，factory等传入的get函数都是在实例inject环境下执行的
+			provide:最初始的方法
+			factory：会缓存函数的执行结果
+			service：会对函数实例话，保证缓存对象存在，且单例
+			value。。。
+			constance。。
+
+		从另外一个角度来想下，为何需要provider以及instance 两种injector，
+		从java容器的角度来看，容器需要缓存两种，一个是java 类，一个是java类对应生成的对象，
+		java 类对应 这里的provide，instance对应 对象实例。
+
+		这里还有个疑问，在angularjs里面，每一个provide对应的 实例话后的，instancecache 都是唯一的··，
+		而在java容器里面，一个class 可能会根据需要生成多个 object，但是这里一个class 只有一个object。
+		so，why···如果可以配置生成多个object不是更好么？ 或者 在object上面来处理这个？
+		可能需要了解 一些
 
 
 	8._runBlocks 的执行
+		runBlocks在单独的模块里面并没有处理，只是简单的合并子模块的或者依赖模块的runBlocks
+
+		runBlocks = runBlocks.concat(loadModules(moduleFn.requires)).concat(moduleFn._runBlocks);
+
+		在最后，runBlocks被统一处理,代码如下：
+		也就是instance注射器来调用执行，（在这里如果配置依赖$inject,那么就是实例injector）
+			instanceInjector.invoke(fn || noop);
+		runBlocks主要包含哪些呢，从load分析来看，主要是module.run 这种接口传入的函数，以及模块本身是函数指令的·
+
+
+  看完这一块对angluarjs的模块组织以及注射器基本清楚，就是 scopilePrivoder,这个provider应该是 angularjs十分核心的一个功能
+  剩下的就是分析angularjs的主要$provider
+
+  目前来看，可以考虑下如何扩展angularjs，例如，动态模块加载，动态加载机制的考虑··
 
 
 

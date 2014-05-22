@@ -31,3 +31,4 @@ input设置change事件，如果value改变，则把值赋span的html里面，�
 
 so，另外一种方法，使用textarea，对回车事件做处理，这个方案的问题是 必须精确计算textarea每一行的高度，
 而且对于删除行的问题不好处理。。。。
+

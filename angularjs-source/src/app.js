@@ -16,10 +16,16 @@ app.controller('AppCtrl', ['serviceTest', function AppCtrl(serTest) {
 
 }]);
 
-app.run(function(){
+app.factory('testFactory',function(){
+    console.log('testFactory run');
+    return '12312';
+})
 
-    console.log('run');
-});
+app.run(['testFactory',function(testFactory){
+
+    console.log('this the run fn');
+    console.log('you can knoew testFactory is:'+testFactory);
+}]);
 
 app.service('serviceTest',function(){
     console.log('serviceTest');
@@ -30,3 +36,7 @@ var ff =angular.module('test-other', [],function(){
     console.log('test-other module');
 });
 
+
+angluar.bootsrtap(
+
+)
