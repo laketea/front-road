@@ -37,6 +37,3 @@ var ff =angular.module('test-other', [],function(){
 });
 
 
-angluar.bootsrtap(
-
-)
