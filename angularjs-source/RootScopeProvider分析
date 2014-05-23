@@ -109,3 +109,22 @@ watch代价比oberver更高
 
 
     $$postDigestQueue,这个就是在执行完检测并且没有脏值的时候，处理这个队列，取出期中的函数并执行，初步看来是 触发$disgest的作用
+
+8.$apply
+    加入执行环境，并且运行完后，如果没有diest，则会保证调用digest，也就是说，这种函数执行完后，会保证有digest执行
+    
+9.事件机制
+  $broadcast
+  $emit
+  $on
+
+  这里的事件机制比较简单，
+  $emit 往上冒泡，可以被stopPop
+  但是$broadcast 不可以···
+
+  实现起来比较简单，$$listeners 是一个二维数组，第一位根据事件名称存储，有事件来的时候，就遍历这个数组
+
+  发事件也比较简单，$emit 就是往parent 层层处理，
+  $broadcast 深度优先递归
+
+  另外$on一个事件后，也会返回一个函数，执行就清理这个事件
