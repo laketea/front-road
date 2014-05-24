@@ -1,0 +1,71 @@
+$CacheFactyoryProvider
+
+===
+
+提供一个缓存的 工厂 
+
+功能比较简单
+API设计的很灵活
+
+1.创建一个cache的实例，采用工厂方法
+var caches ={}
+function cacheFactory(id,options){
+	data = {};
+
+	return cache[id] ={
+
+		put:funciton(){},
+		get:functon(){},
+		remove:fucntion(){},
+		removeAll:
+		destory:
+		info:
+	}
+}
+
+而get info做为类函数，这样层级比较清晰，直接写再cacheFactor上面
+cacheFactory.get(id)
+cacheFactory.info() //获取所有的info
+
+这种方式很巧妙，一个函数上面提供所有的API，函数执行一个操作，函数方法做为其他的API，
+而且执行是一种工厂方法，返回另外一种对象，上面又提供其他的API，很适合做为这种cache的缓存设计，
+或者说双层结构，而自己写或者设计API的时候经常都是单层思维··
+
+JS
+
+
+如果是自己写 会怎样写？
+
+cache = [][];
+
+put:(key,value,cacheId);
+.....
+
+而他这里每个cache做为一个单独的对象存在，分层比较好
+
+
+2.小技巧
+
+	var lruEntry = lruHash[key] || (lruHash[key] = {key: key});
+
+	这种写法很简洁,自己是怎么写的？
+
+	if(!cache[id]){
+		cache[id] = value;
+	}
+	z = cache[id];
+
+3.lru的概念
+
+lruHash = {},
+          freshEnd = null,
+          staleEnd = null;
+          貌似是为了提升效率？
+将最新更改的放在link的前面
+
+
+5.function $TemplateCacheProvider() {
+  this.$get = ['$cacheFactory', function($cacheFactory) {
+    return $cacheFactory('templates');
+  }];
+}
