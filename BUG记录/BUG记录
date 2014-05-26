@@ -24,3 +24,20 @@ BUG记录
 $('#c_b input[type="checkbox"]:checked').each(function() { 
         $('#t').append(', '+$(this).val());
     });
+
+ 6.启动多个tomcat
+
+ 	修改tomcat地址：8080
+ 	修改AJP地址：8009
+ 	修改SHUTDOWN地址:8005˜
+
+ 7.动态合并与非动态合并下 less中的url路径问题
+
+ 	1.1 所有css写全局的combine文件中，通过import引用
+ 		编译的时候，只编译combine文件，-up，补全relative路径， -rp 补全发布地址
+
+ 	1.2 所有的css url相对于项目跟地址来写，combine的时候，使用rootpath来处理
+
+ 8. == 与 === 的区别，
+ 	why null == undefined : is true;
+ 	

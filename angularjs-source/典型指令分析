@@ -1,0 +1,24 @@
+典型指令分析
+
+1.ngInit
+	so easy
+	compile: function() {
+    return {
+      pre: function(scope, element, attrs) {
+        scope.$eval(attrs.ngInit);
+      }
+    };
+  }
+
+2.ngClass
+
+三种用法：
+	1.string
+	2.数组
+	==前两组 都是对应表达式值的class
+	3.对象
+	ng-class="{strike: deleted, bold: important, red: error}"
+	key是class name，value是的 true false 控制是否使用这个class
+
+3. $animate[toBoolean(value) ? 'removeClass' : 'addClass'](element, 'ng-hide'); 
+	小技巧，看起来很简洁

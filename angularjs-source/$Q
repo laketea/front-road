@@ -1,0 +1,189 @@
+＃$HTTP $Q $RESOURCE
+
+===
+
+##$Q
+
+基本用法
+
+	var deferred = $q.defer();
+	var promise = deferred.promise;
+	var resolvedValue;
+
+	deferred.resolve(123);//成功
+	deferred.reject('fail');//失败
+
+###1 $q.defer();
+
+defer是一个函数
+函数内部的私有变量主要是pending =[];
+这个函数每执行一次，里面的pending都是一个新的数组，这个就是backend的缓存
+
+这个也是用的构造器模式，使用起来确实很简洁，利用闭包的特性
+
+defer = function(){
+	
+
+	var deferred ={
+		resolve:
+		reject:
+		notify:
+		promise:
+	}
+
+	return deferred;
+}
+
+
+A.$q.defer();创建了一个defer.$01;
+
+B.$q.defer.promise.then
+	创建了一个defer.$02;
+	包了一个函数， $02.resolver(fn(value));
+
+		if (pending) {
+            pending.push([wrappedCallback, wrappedErrback, wrappedProgressback]);
+          } else {
+            value.then(wrappedCallback, wrappedErrback, wrappedProgressback);
+          }
+	
+	然后分两种情况：
+	1.pending存在的时候，这个时候也就是defer状态未改变的时候
+		这个函数扔进了$01.pending;
+	2.复制pending===value
+		value.then(包装函数)；
+		再分析下，这个vlaue也有两种情况，
+			2.1：如果value是最底层的，也就是说没有嵌套的话,
+				 因为result，以及callback里面的defer都是空defer，所以也就等于直接执行fn(各种成功，失败会带哦)
+				 var result = defer();
+			        result.resolve(callback(value));
+			        return result.promise;
+			2.2 如果value是嵌套defer，那么，
+				回掉函数穿给子函数的defer，要么直接执行，要么push子函数的callback
+
+C.$q.defer.resolver(2):
+	如果pendding不存在，则不处理。
+	如果存在，这 设置pending未不存在，并且设置闭包的 value未新的promise
+	这里的val有两种情况，
+	1.简单对象
+		创建一个直接执行的deffer
+			then: function(callback) {
+		        var result = defer();
+		        nextTick(function() {
+		          result.resolve(callback(value));
+		        });
+		        return result.promise;
+      		}
+    2.如果是嵌套promise
+    	则直接遍历调用
+    		value.then(a,b,c);
+    		这一步也就是将当前的回掉函数，全部传给嵌套promise，
+  	resolve 从这里来看，只能调用一次，调用一次后就设callback未null，并且设置当前value，
+  	如果后续再设置when，则直接执行value。then（）
+
+
+
+	
+D.$q.reject
+	
+	deferred.resolve(reject(reason));
+
+	reject 函数跟solver的底层空promise差不多，都是直接执行，不过是执行callback，一个是执行errback
+	var result = defer();
+        result.resolve((isFunction(errback) ? errback : defaultErrback)(reason));
+        return result.promise;
+
+    这个结果再穿给resolve，等于设置defer的状态，
+
+E。$q.when
+	将value包装成promise，如果是promise，如果是简单对象，则直接resolver，
+	如果是promise，直接将callback包装进， value.then,
+
+	这个写法初一看好像不太理解，仔细想想 确实要这样写，
+
+	首先，value为简单对象的时候，很简单，主要考虑 promise的情况
+
+	value revolser的时候，result要知道，所以，value的successedcallback，函数里面，要将
+	result.resolve;
+
+	因为整个函数还要返回when，
+	而且如果在状态改变之后，再继续when之后怎么处理呢，
+
+	有几种办法：
+		1.在result.resolve传入 value（promise），这样会引起死循环
+		2.什么都不传，新建一个空的promise，这样就必须手动加when，
+		3.根据newValue，再新建成一个 promise。
+
+	第二个value跟第一个value 是不一样的··
+
+
+	ref(value).then(function(value) {
+        if (done) return;
+        done = true;
+        //这行代码，靠，想了一会
+        //因为这个when方法还要返回promise，
+        result.resolve(ref(value).then(wrappedCallback, wrappedErrback, wrappedProgressback));
+      }, function(reason) {
+        if (done) return;
+        done = true;
+        result.resolve(wrappedErrback(reason));
+      }, function(progress) {
+        if (done) return;
+        result.notify(wrappedProgressback(progress));
+      });
+	
+	这里还有个注意的地方，链式写法多次then并不是平行的，而是嵌套的··
+
+F. $q.all
+	当所以的promise触发后,触发
+
+G. $q.notify
+	callback[2](progress);
+	也就是调用所以 progressback函数
+
+总结:
+	这里也是三层API设计
+	defer 是一个函数，里面的两层是构造函数的方式返回对象，
+	一个defer是一个完整的功能，或者说完整的快。
+	对于不需要继承的或者对象的方式，可以多借鉴这种模式，通过构造函数，执行函数来返回一个新的对象。
+	{
+		defer:{
+			resolve:
+			reject:
+			notify:
+			promise:{
+				when:
+				catch:
+				finnaly
+			}
+
+		}
+		reject:
+		when:
+		all:
+	}
+
+	这块最巧妙的设计 在于 resolve以及then的实现，实现了很多的嵌套 resolve；
+	通过pendding以及value来控制状态，value设计成可嵌套的模式，
+	对于这种复杂功能的巧妙的嵌套 如何设计呢？
+	
+
+	resolve: function(val) {
+        if (pending) {
+          var callbacks = pending;
+          pending = undefined;
+          value = ref(val);
+
+          if (callbacks.length) {
+            nextTick(function() {
+              var callback;
+              for (var i = 0, ii = callbacks.length; i < ii; i++) {
+                callback = callbacks[i];
+                value.then(callback[0], callback[1], callback[2]);
+              }
+            });
+          }
+        }
+      },
+
+

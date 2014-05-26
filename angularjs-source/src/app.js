@@ -6,13 +6,26 @@
  var app =angular.module('app', [],function(){
     console.log('app module');
 });
-app.controller('AppCtrl', ['serviceTest', function AppCtrl(serTest) {
+app.controller('AppCtrl', ['serviceTest','$q', function AppCtrl(serTest,$q) {
 
-   console.log('init');
+   var defer = $q.defer();
 
-    console.log('kkkk');
+    var $promise = defer.promise;
 
-    console.log('use service:'+serTest.test);
+//    $promise.then(function(value){
+//        console.log(value);
+//    });
+//
+//    defer.resolve('test')
+    var funcs = function(){
+        console.log('123');
+    };
+
+
+
+    var def = $q.when($promise,funcs);
+
+    defer.resolve('fuck');
 
 }]);
 

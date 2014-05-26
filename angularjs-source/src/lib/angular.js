@@ -10851,11 +10851,15 @@ function qFactory(nextTick, exceptionHandler) {
    *
    * @returns {Deferred} Returns a new instance of deferred.
    */
+  var deferId =0;
   var defer = function() {
     var pending = [],
         value, deferred;
 
     deferred = {
+
+
+
 
       resolve: function(val) {
         if (pending) {
@@ -10979,7 +10983,8 @@ function qFactory(nextTick, exceptionHandler) {
         }
       }
     };
-
+      deferred.deferId = (deferId++);
+      console.log('deferId:'+(deferred.deferId));
     return deferred;
   };
 
@@ -11142,6 +11147,7 @@ function qFactory(nextTick, exceptionHandler) {
         results = isArray(promises) ? [] : {};
 
     forEach(promises, function(promise, key) {
+
       counter++;
       ref(promise).then(function(value) {
         if (results.hasOwnProperty(key)) return;
