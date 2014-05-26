@@ -1,2 +1,20 @@
 $CompileProvider
 ===
+
+compileProvider 的主要功能是
+directive,也就是registerDirective，注册指令的功能
+另外一个就是compile的功能
+
+### 注册指令
+
+指令在这个provider中有个全局的缓存，在provider中
+
+	var hasDirectives = {}
+这个是个二维数组
+
+从代码上看，在运行之前，相同的指令会被添加到 这个hasDirective中，
+所有 directiveFacotry 放入，这个hasDirective中，
+而，真正初始化这个name对应的指令的时候，会遍历对应的hasDirective, 将每个之类都初始化，并放入数组中，将这个数组放入 cache中。也就是说从源码的角度来看，是支持directive同名支持多个的
+
+###Compile
+这个方法就是之类的最核心的方法了
