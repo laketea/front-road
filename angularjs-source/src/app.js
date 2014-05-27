@@ -6,7 +6,7 @@
  var app =angular.module('app', [],function(){
     console.log('app module');
 });
-app.controller('AppCtrl', ['serviceTest','$q', function AppCtrl(serTest,$q) {
+app.controller('AppCtrl', ['$scope','serviceTest','$q', function AppCtrl($scope,serTest,$q) {
 
    var defer = $q.defer();
 
@@ -26,6 +26,8 @@ app.controller('AppCtrl', ['serviceTest','$q', function AppCtrl(serTest,$q) {
     var def = $q.when($promise,funcs);
 
     defer.resolve('fuck');
+
+    $scope.area ="test";
 
 }]);
 
@@ -47,6 +49,27 @@ app.service('serviceTest',function(){
 
 var ff =angular.module('test-other', [],function(){
     console.log('test-other module');
+});
+
+app.directive('fileType',function(){
+
+    return {
+        restrict:'E',
+        template:'<div class="FFFFF{{text}}" fied="{{text}}">123123123{{text}}</div>',
+        scope: {
+            model: '=',
+            attr: '=',
+            value: '='
+        },
+        compile:function(){
+            console.log('compile');
+            return function(scope){
+                scope.text = 'fuck';
+                console.log('link');
+            }
+        }
+
+    }
 });
 
 

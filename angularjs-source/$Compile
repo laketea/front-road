@@ -18,3 +18,157 @@ directive,也就是registerDirective，注册指令的功能
 
 ###Compile
 这个方法就是之类的最核心的方法了
+
+1.node jquery包装
+
+2.处理node中的 textnode，包装再span中
+
+3.生成组合link函数
+
+	compositeLinkFn =
+              compileNodes($compileNodes, transcludeFn, $compileNodes,
+                           maxPriority, ignoreDirective, previousCompileContext);
+    3.1 遍历 nodeList，对于每个nodeList var linkFns = [],；
+    	
+	    3.2 对于每个node 先收集node的所以指令，（遍历树形，class，tag来查找是否包含对应指令）
+		    collectDirectives(nodeList[i], [], attrs, i === 0 ? maxPriority : undefined,
+		                                        ignoreDirective)
+
+		   3.2.1 collectDirectives
+		   		这里收集指令的时候，顺便把attr对应dom的属性设置好了
+		   		switch(nodeType){
+		   			case element:
+		   				根据tag，addDirective（E）
+		   				根据calssname 
+		   					addAttrInterpolateDirective(node, directives, value, nName);
+		   					addDirective
+		   				根据 attr
+		   			case text：
+		   				addTextInterpolateDirective
+		   			case comment
+		   				addDirective（M）
+
+		   		}
+
+		   		这里要注意InterpolateDirective，这个指令就是处理{{}}情况的绑定的，
+		   		addTextInterpolateDirective：处理文本，其实内部的实现 也就是通过watch来实现，
+		   		addAttrInterpolateDirective：处理属性，普通属性以及class属性。也是通过watch来实现来监听
+
+		   		$watch(interpolateFn, function interpolateFnWatchAction(newValue, oldValue) {
+                    if(name === 'class' && newValue != oldValue) {
+                      attr.$updateClass(newValue, oldValue);
+                    } else {
+                      attr.$set(name, newValue);
+                    }
+                  });
+
+
+		   		3.2.1.1 addDirective
+		   			根据name 判断 hasDirectives中是否存在对应的指令，如果有，则用$injector.get取出来，
+		   			放入 收集到的 directive中
+		   		3.2.1.2 addAttrInterpolateDirective
+
+		   	3.2.2 根据权重做一次排序 directives.sort(byPriority);
+		3.3 如果收集到对应的指令，则应用指令到 结点，返回一个linkFn
+			applyDirectivesToNode(directives, nodeList[i], attrs, transcludeFn, $rootElement,
+	                                      null, [], [], previousCompileContext)
+
+	        3.3.1 applyDirectivesToNode函数中，遍历当然结点的 指令集。在当前node上执行每个指令。以下为每次遍历的步骤
+		        3.3.2 每次遍历 如果有start，则重新设置$compileNode,$compileNode = groupScan(compileNode, attrStart, attrEnd);
+		        3.3.3 处理 directive.controller；
+		        	controllerDirectives[directiveName] = directive;
+		       	3.3.4 处理 directive.transclude
+		       	3.3.5 处理 directive.template
+		       	3.3.6 处理 directive.templateUrl
+		       			templateUrl走的另外一条线，也就是不走下一步 compile
+		       	3.3.7 处理 directive.compile
+		    3.3.2 遍历完成后，返回 nodeLinkFn 函数
+
+		    	nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope === true;
+	      		nodeLinkFn.transclude = hasTranscludeDirective && childTranscludeFn;
+
+	    3.4 递归编译子结点，并返回linkFn	
+	    	childLinkFn = compileNodes(childNodes,nodeLinkFn ? nodeLinkFn.transclude : transcludeFn);
+	    3.5 将当前结点的nodeLinkFn以及子结点的linkFn都push到linkFns
+	    	linkFns.push(nodeLinkFn, childLinkFn);
+	3.6 如果有linkFn 则返回 组合linkFn 
+		return linkFnFound ? compositeLinkFn : null;
+4.返回publicLinkFn函数
+5.执行link函数
+	|compile(element)|(scope);
+	这个执行的函数，就是 publicLinkFn函数
+
+	5.1 publicLinkFn执行 参数 scope, cloneConnectFn, transcludeControllers
+
+		5.1.1 如果clone为true，则设置$linkNode 为克隆后的结点
+			var $linkNode = cloneConnectFn
+		          ? JQLitePrototype.clone.call($compileNodes) // IMPORTANT!!!
+		          : $compileNodes;
+		5.1.2 遍历 transcludeControllers
+			$linkNode.data('$' + name + 'Controller', instance);
+		5.1.3 遍历linknode
+			$linkNode.eq(i).data('$scope', scope);
+		5.1.4 if (cloneConnectFn) cloneConnectFn($linkNode, scope);
+		5.1.5 如果组合 linkfun存在，则执行组合link函数
+			if (compositeLinkFn) compositeLinkFn(scope, $linkNode, $linkNode);
+
+			compositeLinkFn函数的执行 就是遍历linkFuns，执行每个linkFn，每次遍历递增两次i++
+			正好 获取到当前nodeLinkFn，以及childLinkFn
+			下面看看每个遍历如何处理
+			5.5.1 如果nodeLinkFn.scope===true 表明需要
+				if (nodeLinkFn.scope) {
+	              childScope = scope.$new();
+	              $node.data('$scope', childScope);
+	            } else {
+	              childScope = scope;
+	            }
+	        5.5.2 执行nodeLinkFn，
+	        	nodeLinkFn(childLinkFn, childScope, node, $rootElement, boundTranscludeFn);
+	        5.5.3 如果childLinkFn,这里其实就是递归执行Fn
+	        	则执行childLinkFn，也就是组合compositeLink
+	        	childLinkFn(scope, node.childNodes, undefined, boundTranscludeFn);
+
+6.顶级link函数的最小执行单元 其实就是3.3.2的nodeLinkFn
+	这里貌似只处理了几个事情
+	1.controller的初始化
+	2.scope的处理，以及指令中scope对应的属性的处理
+	3.prev 与post函数，这两个的区别，执行点不一样，一个是再childFn执行前，一个是childFn执行后
+
+	由于这个函数在applyDirectivesToNode函数中，所以共享这个函数一些变量，
+	preLinkFns
+	postLinkFns
+	这两个数组保存的是，一个node结点对应的所以指令的 pre以及post link函数，
+	指令的link默认是 post link
+
+
+NOTE：
+
+linkFns以及CompositeLinkFn函数设计,CompositeLinkFn内部包含了结点的linkFns
+
+linkFns：0： body     -》linkFn
+	     1： children -> CompositeLinkFn ----linkFns [
+													     0:child1：linFn，1：child1：CompositeLinkFn
+													     1:child2：linFn，3：child2：CompositeLinkFn
+												     ]
+以这种结构来链式链接所以的linkFN
+linkFns是每一层是一个数组，例如body同级  有一个，也就是topFuns
+body的所以child，又有一个，child1的所以children又有一个，以此类推
+
+
+
+指令的requires分析
+作用：找到当前node 或者父node的对应的controller，传给当前node的link函数。
+getControllers(directiveName, require, $element, elementControllers) 
+	根据require的设置，
+	如果是普通设置，则从当前node的controller里面找，（elementControllers，在applyDirectoFn里面的变量，每个node拥有一份）
+	如果是^开头，则从继承的data里面找（也就是从父controller里面找） 
+		$element[retrievalMethod]('$' + require + 'Controller')
+		inheritedData
+
+指令的includeFn分析
+	
+
+
+
+
+
