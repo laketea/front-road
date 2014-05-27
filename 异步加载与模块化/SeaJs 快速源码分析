@@ -4,3 +4,75 @@ SeaJs 快速源码分析
 
 主要是分析 javascript加载后，其inline如何知道当前js文件的路径的问题，以及事件的回掉问题
 
+1.mod.load
+
+	1.1 解析所以的uri，根据当前module。url以及deps的url，返回新的url
+	1.2
+	遍历新的uris，根据每个uri 新建一个module，并且维护两个状态，_remain,_waitings
+
+	1.3判断remain，如果为0，则执行onLoad方法
+
+	1.4再次遍历，uris，取出每个uri对应的模块，这里有个变量requestCache
+		如果url模块已经保存了，则直接load
+		如果url模块没有保存，则fetch
+
+		1.4.1分析 fetch
+			这里主要是讲sendRequest函数缓存进cache中
+			sendRequest
+				调用seajs.request(url,onRequest,charset);
+
+			onRequest:也就是request成功或者失败后的回调函数
+
+				if (anonymousMeta) {
+					//这一步就是讲uri对应的module重设状态，问题是这个uri怎么得到的
+			      Module.save(uri, anonymousMeta)
+			      anonymousMeta = null
+			    }
+
+			    将callBackList中对应的mod取出来，然后将这个mod load
+			    var m, mods = callbackList[requestUri]
+			    delete callbackList[requestUri]
+			    while ((m = mods.shift())) m.load()
+
+
+
+	1.5 上面的步骤，得到的requestCache，这里变量集中发请求
+
+
+2.request 分析
+	这个比较简单，就是处理所以情况的文件加载，
+	在加载后，调用callback
+
+	多了两个处理就是
+	currentlyAddingScript = node
+
+3.define 分析
+	靠原来是这样
+
+	在define里面，其实，并不知道自己模块的名字（IE6-9中可以知道）
+	那么怎么办呢，
+
+	也就是在回调函数里面，onRequest
+	这里因为在闭包里面，所以这里有调用request的uri，
+	这样
+		 Module.save(uri, anonymousMeta)
+
+		 if (mod.status < STATUS.SAVED) {
+		    mod.id = meta.id || uri
+		    mod.dependencies = meta.deps || []
+		    mod.factory = meta.factory
+		    mod.status = STATUS.SAVED
+		  }
+    
+4.回顾一下，子模块
+假如A，requeire B， B REQIER c
+
+假如A已经加载进来了， 那么A load，这个时候 A已经知道A的require了，
+B的模块已经被建立了，
+	但是这个时候，B的模块并没有依赖，在Bdefine的时候，把依赖假如到 metadata中，然后回调的时候，再把meta中的依赖save到 B的module
+
+	然后又加载B
+
+
+5.这里有个疑问，什么时候只想onload呢？
+	onload里面触发

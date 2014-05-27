@@ -1,0 +1,169 @@
+angular.module('sea',['ng']).provider('$module',['$q',function(){
+
+
+	var cachedMods = seajs.cache = {}
+	var anonymousMeta
+
+	var fetchingList = {}
+	var fetchedList = {}
+	var callbackList = {}
+
+	var STATUS = Module.STATUS = {	
+	  // 1 - The `module.uri` is being fetched
+	  FETCHING: 1,
+	  // 2 - The meta data has been saved to cachedMods
+	  SAVED: 2,
+	  // 3 - The `module.dependencies` are being loaded
+	  LOADING: 3,
+	  // 4 - The module are ready to execute
+	  LOADED: 4,
+	  // 5 - The module is being executed
+	  EXECUTING: 5,
+	  // 6 - The `module.exports` is available
+	  EXECUTED: 6
+	}
+
+	function Module(uri, deps) {
+	  this.uri = uri
+	  this.dependencies = deps || []
+	  this.exports = null
+	  this.status = 0
+
+	  // Who depends on me
+	  this._waitings = {}
+
+	  // The number of unloaded dependencies
+	  this._remain = 0
+	}
+
+	Module.prototype = {
+
+		//解析当前module的 依赖文件的url
+	  resolve:function(){
+	  	  var mod = this
+		  var ids = mod.dependencies
+		  var uris = []
+
+		  for (var i = 0, len = ids.length; i < len; i++) {
+		    uris[i] = resolve(ids[i], mod.uri)
+		  }
+		  return uris
+	  },
+
+	  load:function(){
+		  var mod = this
+
+		  // If the module is being loaded, just wait it onload call
+		  if (mod.status >= STATUS.LOADING) {
+		    return
+		  }
+
+		  mod.status = STATUS.LOADING
+
+		  // Emit `load` event for plugins such as combo plugin
+		  var uris = mod.resolve()
+		  emit("load", uris)
+
+		  var len = mod._remain = uris.length
+		  var m
+
+		  // Initialize modules and register waitings
+		  for (var i = 0; i < len; i++) {
+		    m = Module.get(uris[i])
+
+		    if (m.status < STATUS.LOADED) {
+		      // Maybe duplicate: When module has dupliate dependency, it should be it's count, not 1
+		      m._waitings[mod.uri] = (m._waitings[mod.uri] || 0) + 1
+		    }
+		    else {
+		      mod._remain--
+		    }
+		  }
+
+		  if (mod._remain === 0) {
+		    mod.onload()
+		    return
+		  }
+
+		  // Begin parallel loading
+		  var requestCache = {}
+
+		  for (i = 0; i < len; i++) {
+		    m = cachedMods[uris[i]]
+
+		    if (m.status < STATUS.FETCHING) {
+		      m.fetch(requestCache)
+		    }
+		    else if (m.status === STATUS.SAVED) {
+		      m.load()
+		    }
+		  }
+
+		  // Send all requests at last to avoid cache bug in IE6-9. Issues#808
+		  for (var requestUri in requestCache) {
+		    if (requestCache.hasOwnProperty(requestUri)) {
+		      requestCache[requestUri]()
+		    }
+		  }
+	  },
+
+	  onload:function() {
+		  var mod = this
+		  mod.status = STATUS.LOADED
+
+		  if (mod.callback) {
+		    mod.callback()
+		  }
+
+		  // Notify waiting modules to fire onload
+		  var waitings = mod._waitings
+		  var uri, m
+
+		  for (uri in waitings) {
+		    if (waitings.hasOwnProperty(uri)) {
+		      m = cachedMods[uri]
+		      m._remain -= waitings[uri]
+		      if (m._remain === 0) {
+		        m.onload()
+		      }
+		    }
+		  }
+
+		  // Reduce memory taken
+		  delete mod._waitings
+		  delete mod._remain
+		}
+
+
+
+	}
+
+
+
+	function resolve(id, refUri) {
+	  // Emit `resolve` event for plugins such as text plugin
+	  var emitData = { id: id, refUri: refUri }
+
+	  return emitData.uri || seajs.resolve(emitData.id, refUri)
+	}
+
+	function get(uri, deps) {
+	  return cachedMods[uri] || (cachedMods[uri] = new Module(uri, deps))
+	}
+
+
+	this.get = get;
+
+	this.resolve = resolve;
+
+
+
+
+
+
+
+
+
+
+
+}])
