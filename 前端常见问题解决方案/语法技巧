@@ -1,0 +1,3 @@
+语法技巧
+
+1.factory(require, mod.exports = {}, mod) :

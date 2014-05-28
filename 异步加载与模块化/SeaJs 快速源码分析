@@ -74,5 +74,27 @@ B的模块已经被建立了，
 	然后又加载B
 
 
-5.这里有个疑问，什么时候只想onload呢？
-	onload里面触发
+5.这里有个疑问，什么时候触发onload呢？
+	最底层的那个module的onload是如何触发的呢？
+	最底层的那个onload是在load方法里面触发，
+	如果这个模块没有依赖，或者依赖的模块都加载完了，那么则执行onload方法，
+	 上层的模块的onload，都是在onload里面递归触发的
+
+	if (mod._remain === 0) {
+    mod.onload()
+    return
+  }
+
+
+6.sea 模块的执行顺序，加载进来以后 factory并没有执行
+	只是把module加载进来了，module又个factory方法，这个方法就是模块的真正的执行函数
+
+	什么时候执行呢？
+	var data = require('./data');
+	只有真正在代码里面 requeire实例后，才会执行，看require方法
+
+	function require(id) {
+	    return Module.get(require.resolve(id)).exec()
+	  }
+
+	取出模块，然后执行
