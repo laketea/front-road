@@ -1,0 +1,173 @@
+Javascript特殊知识点
+
+1.==与===
+=== 是恒等
+	1.如果类型不同，则false
+	2.如果类型相同，且值相同则等于
+
+== 是等于
+	1.如果类型相同，跟===一样
+	2.如果类型不同，则会做类型转换后再比较
+		a. null == undefined true
+		b. 字符串与数值，会将字符串转换为数字后再比较
+		c. boolean与其他的比较，true 转换为1，false转换为0，再比较
+		d. 对象与数值或字符串比较，先讲对象转换为基础类型（toString，或者valueOf），再与另一个值比较
+
+
+2.函数定义方式
+
+函数定义的方式有多种
+
+	a.函数声明
+	b.函数表达式
+	c.另外一种方式
+
+函数声明与函数表达式的区分
+	函数声明在作用域内会被提前声明
+	部分调试器的栈中函数表达式不会显示函数名称，函数声明会显示（chrome的调试器都会显示）
+	如果不声明函数名称，则一定是表达式
+	如果声明了函数名称，不一定是函数声明,具体区分方法如下：（主要通过上下文）
+		a.如果是赋值表达式的一部分，则是函数表达式 //var bar = function foo(){}
+		b.如果使用new ，则是表达式 //new function bar(){}
+		c.如果在（）内部，则是表达式 //(function foo(){})
+
+根据上面的区分，有一种特殊的类型，命名函数表达式，安装规范这个函数的名字只能在这个函数的内部有效，
+	
+	var f = function foo(){
+	    return typeof foo; // foo是在内部作用域内有效
+	  };
+	  // foo在外部用于是不可见的
+	  typeof foo; // "undefined"
+	  f(); // "function"
+
+IE中的BUG（ie9以下）
+ie中对命名函数表达式，在函数的外部也可以使用这个函数的命名，
+而且这个函数的名字 跟表达式获取的函数 是不同的函数对象。
+
+	
+	var f = function g(){};
+    f === g; // false
+
+这样就会导致一个内存的问题，因为g永远不会被释放，所以需要显示的释放g
+
+	var f = function g(){};
+    g = null;
+
+
+函数声明的声明时间点:函数声明会在当前作用域最先被声明，并且声明为局部变量。
+
+    (function(){
+
+        var g = null;
+        var a =function g(){//这里要注意不能混淆，首先这个不是函数声明，其次，g只能在函数内部使用
+            alert('1');
+        }
+        a();
+        g();//报错，
+    })()
+
+    (function(){
+        var g = null;
+        function g(){
+            alert('1');
+        }
+        g();//报错，因为g在var g之前提前声明为局部变量，那么再声明 var g =null;则覆盖了
+    })()
+
+    <script>
+    (function(){
+        g = 'test';
+        function g(){
+            alert('1');
+        }
+        console.log(g);//test
+        console.log(window.g);//undefined，因为声明函数被提前声明，且声明为局部变量
+    })()
+</script>
+
+
+SpiderMonkey的怪癖
+对于命名表达式内部的作用域会有一个特殊的对象，作用域链中，foo的局部环境的下一个对象 就是{foo:<function object>};
+当然高版本的浏览器已经解决这个问题（“特殊”对象不再继承Object.prototype了）
+	Object.prototype.x = 'outer';
+  
+	  (function(){
+	    
+	    var x = 'inner';
+	    
+	    /*
+	      函数foo的作用域链中有一个特殊的对象——用于保存函数的标识符。这个特殊的对象实际上就是{ foo: <function object> }。
+	      当通过作用域链解析x时，首先解析的是foo的局部环境。如果没有找到x，则继续搜索作用域链中的下一个对象。下一个对象
+	      就是保存函数标识符的那个对象——{ foo: <function object> }，由于该对象继承自Object.prototype，所以在此可以找到x。
+	      而这个x的值也就是Object.prototype.x的值（outer）。结果，外部函数的作用域（包含x = 'inner'的作用域）就不会被解析了。
+	    */
+	    
+	    (function foo(){
+	      
+	      alert(x); // 提示框中显示：outer
+	    
+	    })();
+	  })();
+
+3.var 的预解析（hoisting）
+
+在同一个作用域中，不管var处于什么位置，var都会被提前声明，但是var的赋值是在代码中的位置进行的,
+但是有一点一个变量在执行域里面，只会被声明一次
+
+	myname = "global"; // 全局变量
+	function func() {
+	    alert(myname); // "undefined"，之所以这样，是因为 myname会被提前声明，但是myname的赋值并没有提前执行，所以是undefined
+	    var myname = "local";
+	    alert(myname); // "local"
+	}
+	func();
+
+	//上面这段代码等同与下面的代码，
+	myname = "global"; // global variable
+	function func() {
+	   var myname; // 等同于 -> var myname = undefined;
+	   alert(myname); // "undefined"
+	   myname = "local";
+	   alert(myname); // "local"}
+	func();
+
+	(function(){
+        var g;//到这一步g已经被声明并且定义为函数了，所以这个声明无效
+        function g(){
+            alert('alert');
+        }
+       g();//正常，g还是函数
+    })()
+
+    (function(){
+        
+        function g(){
+            alert('alert');
+        }
+        var g;
+       	g();//正常
+    })()
+
+    (function(){
+        
+        function g(){
+            alert('alert');
+        }
+        g();//正常
+        var g=1;//因为 声明函数的g已经提前声明了，所以这个g并不会声明，但是执行到这一步g会被赋值为1
+       	g();//报错，
+    })()
+
+	也证因为这样，大部分代码规范都推荐把变量的声明 放在代码的开始处，以避免这种混乱
+
+	javascript中，有一个name resolution order规则，
+		语言内置，所有的作用域中都有this和arguments关键字
+		形式参数，函数的参数在整个作用域中都是有效的
+		函数声明
+		变量声明
+	个人理解，这个是声明的顺序，但是一个变量被声明后，就不会被再次被声明所覆盖，也就是说再次声明会被忽略，但是可以被再次赋值。
+
+
+
+	
+
