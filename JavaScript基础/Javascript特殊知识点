@@ -59,7 +59,7 @@ ie中对命名函数表达式，在函数的外部也可以使用这个函数的
     (function(){
 
         var g = null;
-        var a =function g(){//这里要注意不能混淆，首先这个不是函数声明，其次，g只能在函数内部使用
+        var a =function g(){//这里要注意不能混淆，首先这个不是函数声明（命名函数表达式的名称并不会提前声明），其次，g只能在函数内部使用
             alert('1');
         }
         a();
@@ -166,6 +166,179 @@ SpiderMonkey的怪癖
 		函数声明
 		变量声明
 	个人理解，这个是声明的顺序，但是一个变量被声明后，就不会被再次被声明所覆盖，也就是说再次声明会被忽略，但是可以被再次赋值。
+
+
+4.call 的第一个参数
+	如果第一个参数传入的对象调用者是null或者undefined的话，call方法将把全局对象（也就是window）作为this的值。
+
+	function a() {
+	    alert(this);
+	}
+	a.call(window);//答案是 undefined
+
+5.变量对象
+
+	变量对象是一个与执行上下文相关的特殊对象，它存储着上下文中声明的：变量（var，变量声明）,函数声明,函数的形参。
+
+	全局对象的变量对象就是全局对象本身，全局对象只存在一份。
+
+	函数上下文中的变量对象,
+	函数上下文的变量对象包含一个特殊的属性，arguments;
+
+		VO = {
+			arguments：<ARG>
+			...
+		}
+
+	arguments对象有如下属性：
+		callee - 指向当前函数额引用
+		length - 真正传递的参数个数
+		properties-indexs， 这里有个要注意的，properties-indexes与实际传递进来的参数之间是共享的(可以理解为指向同一个内存地址，那么如果argments上改变了的化，参数列表中的对应项也改变)
+		但是这个共享仅限传入的参数个数之内。
+
+		function foo(x, y, z) {
+ 
+		  // 声明的函数参数数量arguments (x, y, z)
+		  alert(foo.length); // 3
+		 
+		  // 真正传进来的参数个数(only x, y)
+		  alert(arguments.length); // 2
+		 
+		  // 参数的callee是函数自身
+		  alert(arguments.callee === foo); // true
+		 
+		  // 参数共享
+		 
+		  alert(x === arguments[0]); // true
+		  alert(x); // 10
+		 
+		  arguments[0] = 20;//改变0位置上的参数，x也改变
+		  alert(x); // 20
+		 
+		  x = 30;
+		  alert(arguments[0]); // 30，改变X，那么0位置上的参数也改变
+		 
+		  // 不过，没有传进来的参数z，和参数的第3个索引值是不共享的
+		  z = 40;
+		  alert(arguments[2]); // undefined
+		 
+		  arguments[2] = 50;
+		  alert(z); // 40
+		 
+		}
+		 
+		foo(10, undefined);
+
+
+6.处理上下文代码
+	执行上下文代码分成两个基本阶段来处理：
+		1.进入执行上下文
+		2.执行代码
+
+	6.1进入执行上下文
+		当进入执行上下文时，VO已经包含了变量对象，这个时候变量对象包含了所以的声明
+
+		a:函数的所以形参，
+			在变量对象中，会创建 形参名称对应的属性，并且会将形参的值设置到属性上
+			function(a,b,c)()(1,2)
+			VO ={a:1,b:2,c:undefined};
+		b:函数声明
+			在变量对象中，会创建函数声明名称对应的属性，其值对对应的函数对象。
+			如果变量对象已经存在相同名称的属性，则完全替换这个属性，
+			也就是说函数声明可以覆盖形参中定义的对象，测试例子如下：
+
+			(function (a, b, c) {
+
+		        console.log(a);//输出的函数，则可以证明函数声明会覆盖形参的声明(这句话可能需要再考虑下，但是不管怎样，实现结果是清晰的)
+		        console.log(arguments[0]);//这里也是函数，因为可以理解为上下文的变量都是存在变量对象上的，
+		        //而arguments跟形参是共享，也就是说都是指向变量对象对应的a属性
+		        function a() {
+		            console.log('111');
+		        }
+		        a();
+		    })(1,2,3);
+
+		c:变量声明
+			在变量对象中，会创建对应的属性，其值是undefined，如果变量对象中已经存在对应的属性，则不会覆盖
+
+		总结:
+			进入执行上下文之前，变量对象已经有过一个声明的阶段，这个声明按照如下顺序：形参，函数声明，变量声明。
+			函数声明会覆盖形参的声明，变量声明不会覆盖以上两者。
+			形参以及函数声明会将变量的值也赋到对应的变量对象的属性上，而变量声明不会赋值，变量声明对应的属性都是undefined
+
+		举例说明：
+
+			function test(a, b) {
+			  var c = 10;
+			  function d() {}
+			  var e = function _e() {};
+			  (function x() {});//外面有括号，所以是函数表达式而不是函数声明
+			}
+			 
+			test(10); // call
+
+			当进入test执行上下文时：
+				AO(test) = {
+				  a: 10,
+				  b: undefined,
+				  c: undefined,
+				  d: <reference to FunctionDeclaration "d">
+				  e: undefined
+				};
+	6.2 执行代码
+		在这个周期内，会修改变量对象上的部分值.
+
+		这里要注意，为什么没有X，未保存的函数表达式只有在它自己的定义或递归中才能被调用
+
+		AO(test) = {
+				  a: 10,
+				  b: undefined,
+				  c: 10,
+				  d: <reference to FunctionDeclaration "d">
+				  e: <reference to FunctionExpression "_e">;//这里的_e不太理解，保存到内存中··但是IE8以下，又可以访问，其他的浏览器都只在这个函数内部才可以访问这个变量
+				};
+
+		关于呆if else的变量声明也是一样的道理
+
+			if (true) {
+			  var a = 1;
+			} else {
+			  var b = 2;
+			}
+			 
+			alert(a); // 1
+			alert(b); // undefined,b也声明了
+
+7.var / 变量 / 属性
+
+	首先，明确三个个概念：
+		变量只能通过var来定义
+		变量与属性的一个很大的区别：变量有一个特性(attribute)：{DontDelete}不能通过delete来删除，而属性可以delete来删除
+		全局对象的变量对象就是全局对象本身。
+
+	在js中未通过var定义的 都会被设置到 全局对象的属性上，注意这里是属性，而不是变量。
+
+		var a =1;
+		console.log(a);
+		console.log(b);//这里会报错，因为下一句，b=1并不是变量，不是变量则不会提前声明，执行到这里的时候，会从全局对象中查找b
+		//但是显然B 找不到，所以就报错
+		b=1;
+
+		var a =1;
+		console.log(a);
+		b=1;//在执行阶段，会将b设置为window的属性，至于如何将b设置为a的属性，这个就不得而知了
+		console.log(b);//为什么这里又正常呢？我们注意全局对象的变量对象就是本身，那么到这一步会从当前的变量对象中查找，
+		//也就是从window中查找，因为上一步将window设置为b的属性，故可以找到，所以就不会报错。
+		
+		我们也可以通过另外一种方式来确定B是变量还是属性。通过下面例子可以得出
+
+		var a = 1;
+		b = 1;
+		console.log(delete window.a);// false;
+		console.log(delete window.b);// true
+
+
+
 
 
 

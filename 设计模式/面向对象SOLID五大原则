@@ -1,0 +1,22 @@
+面向对象SOLID五大原则
+
+面向对象，设计目的是 高扩展性、高复用性、高可维护性
+
+1.单一职责SRP（Single Responsibility Principle ）
+	引起类变化的因素永远不要多于一个，也就是说一个类应该只有一个职责，
+	这样方便复用与维护
+
+2.开闭原则OCP(Open Closed Principle) 
+	对扩展开放对修改闭合。
+3.里氏替换原则LSP(Liscov Substitution Principle )
+	子类型必须能够替换他们的基类
+	也就是说，用户使用只需要使用基类来引用就可以了，而不用管具体是什么对象
+
+4.接口隔离原则ISP( Interface Segregation Principle )
+	客户端不应该被迫依赖于他们不用的接口。
+	也就是说接口应该仅包含必要的方法，如果有不必要的方法，那应该拆分成多个接口
+
+5.依赖倒置原则 DIP (Dependency Inversion Principle )
+	高层模块不应该依赖底层模块，两者都应该依赖其抽象
+
+	
