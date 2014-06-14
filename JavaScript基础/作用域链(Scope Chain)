@@ -1,1 +1,60 @@
 作用域链(Scope Chain)
+===
+参考：http://zh.blog.goddyzhao.me/post/11259644092/scope-chain
+作用域的定义：
+	作用域链是一条变量对象的链，它和执行上下文有关，用于在处理标识符时候进行变量查询。
+
+这里的标识符包过变量名，函数名以及函数参数等。
+
+函数的生命周期包过创建以及激活两个阶段。
+
+1.函数创建的时候，函数对象本身就会包含一个包含所有父级作用域的属性，大致可以如下表示：
+
+	Foo.staticScope = [
+		topContext.vo
+		globalContext.vo
+	]
+
+	function top(){
+		function Foo(){
+			var y = 1;
+			...
+		}
+	}
+
+注意：这个staticScope是属于函数对象的属性，而且是再函数的创建阶段就有的，跟函数是否执行物管
+
+2.函数激活阶段，函数有一个上下文对象，而再函数执行之前，函数的上下文对象就会生成。
+这个上下文对象可以大概如下表示：
+
+	fooContext ={
+		this,
+		VO:{y:undefined},
+		scope: VO + Foo.staticScope
+	}
+
+上下文中包含VO，this，scope，这个scope属性就是作用域链。这个scope最底层是当前函数的活动对象（VO）
+scope = vo + Foo.staticScope,这样就包含了当前的活动对象，以及所以父函数的scope。
+
+3.作用域的标识符查询过程
+
+查询过程是二维的，
+	1.首先，根据作用域从最深往最外层查询
+	2.其次，对于每个VO对象，先从VO对象本身上查询，其次在按照原型链的机制查询VO的原型链。
+
+4.特殊情况
+	1.通过Function创建的函数，其staticScope 只包含全局VO
+	2.eval 的上下文与调用的context一样
+	3.with catch
+		with会将对象将with里面的对象加入到 作用域的最前端，而且只在with ｛｝ 内部有效
+
+		function foo(){
+
+			with({a:10}){
+				...
+			}
+		}
+
+		with内部的scope = {a:10} + foo.vo +global.vo
+
+	4.call会不会有影响？
