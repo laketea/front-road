@@ -1,0 +1,187 @@
+Javascript中 this深入理解
+
+===
+
+1.this的定义
+this是执行上下文对象中的一个属性。
+
+	activeContext = {
+		VO:{}//变量对象
+		this：。。
+		scope
+	}
+
+this的值是在进入上下文的时候确定，并且在上下文执行代码的时候不会改变
+
+2.this的使用环境
+this的使用有两种情况，
+	a。全局代码,全局代码中很简单，this始终是全局对象本身
+	b。函数代码中使用。
+		函数代码中的this 是由激活上下文代码的调用者，也就是调用函数的父上下文来提供的。this是用调用函数的方式决定的。
+
+下面主要讨论函数代码中this的使用。
+
+
+3.this的赋值规则
+在函数的调用代码中，
+	a。如果调用括号的左边是引用类型，那么函数中的this，就是引用类型中的base对象，假如这个base对象是null，那么this也会被转换为全局对象。
+	b。如果调用括号的左边是其他类型，this的值自动设置为null，最终this会被转换为全局对象
+也可以说还有第三个规则，如果this为null，则会被设置为global对象。
+
+
+	var foo = {
+	  bar: function () {
+	    alert(this);
+	  }
+	};
+	  
+	foo.bar() // foo是引用类型
+
+	(foo.bar = foo.bar)(); //global
+	(false || foo.bar)();//global
+	(foo.bar, foo.bar)();//global
+	//上面两行代码，|| 以及，赋值操作符，返回的都是函数对象，所以this被设置为global
+
+	(function(){
+		alert(this) // global
+	})() // 这个括号的左边是个函数对象（函数对象不是引用类型）
+
+4.引用类型
+为了理解上面的规则，需要深入的理解引用类型。
+引用类型的结构：
+	var valueOfReferenceType = {
+	  base: <base object>,// 这个base是什么呢？ 也就是拥有这个属性的对象
+	  propertyName: <property name>
+	};
+
+在js中引用类型的值仅存于下面两种情况，下面两种情况返回的值都是引用类型
+	1. 当我们处理一个标示符时;
+	2. 或一个属性访问器;
+
+	4.1处理标识符
+		从变量那章可以知道标识符只要有：变量名，函数名，函数参数名，全局对象中未识别的属性名。
+
+		如果调用括号左边是标识符（变量名，函数名，函数参数名），那么返回的引用对象的base都是global
+		而标识符都是存在于活动对象中的，这里也分为两种情况：
+			a:全局代码中，活动对象就是全局对象本身，所以这个时候引用类型的base就是global
+			b:函数中的活动对象
+				这个时候，引用对象的base就是活动对象，按理说这个时候this应该是指向活动对象的，但是在js规范中有如下规定，也就是说，如果
+				base对象是活动对象，那么在这个调用里面的this会被设置为null，而所以的null又会被转换为global，所以这种情况下，this也就是global。
+
+				When the call operation is applied to a Reference value whose base object is an activation object, null is used as the this value of the call.”
+
+		var obj = {
+	        func:function(){
+	            alert('obj-func:'+this);
+	        }
+	    }
+
+	    var vatest = obj.func
+
+	    vartest() //global
+
+	    function test(func){//函数内部的标识符 处理调用时，call内部的this都是global
+
+	        func();//函数参数名 global
+
+	        function testInner(){
+	            alert(this)
+	        }
+	        testInner();//函数名 global
+
+	        var test2 = function(){
+	            alert(this)
+	        }
+	        test2();// 变量名 global
+	    }
+
+	    test(obj.func);
+
+	4.2 属性访问器
+		属性访问器有两种形式：点好(.) 以及方括号([])
+		属性访问器返回的引用对象比较清晰，其base 就是最底层属性名所在的对象。
+
+
+5.this的一些特殊情况
+
+	1.with
+		因为使用with语句时，with中的对象会被加入到作用域链的最前端，
+		a:那么如果在with代码块里面，使用了with对象的变量，那么这个变量就是存在于with对象了，对应的这个变量返回的引用对象的base，就是这个with对象
+		b:如果使用的不是with里面的变量，那么返回的引用类型的base 就是活动对象，然后 this->null->gloabl
+		var x = 10;
+
+		var test = function(){
+			alert(this.x);
+		}
+  
+		with ({
+		  foo: function () {
+		    alert(this.x);
+		  },
+		  x: 20
+		  
+		}) {
+		  foo(); // 20
+		  test(); // 10
+		}
+		  
+		var  fooReference = { //这个时候，base就死with的对象了
+		  base: __withObject,
+		  propertyName: 'foo'
+		};
+
+	2.catch
+		catch也存在与with类似的情况，但是在es5中修复了。
+
+	3.this 在构造器函数中
+		new操作符，this会设置为新的对象
+
+	4.call和apply
+		this会被设置为对应的第一个参数，如果this为null，则会被设置为global
+		apply第二个参数必须是数组或者类数组对象(arguments)
+
+
+6.一个复杂的例子
+
+	var x = 1;
+	    function foo(){
+	        var x = 2;
+	        function fn1(){
+	            console.info(this.x);
+	        }
+	        with({
+	            fn2: function(){
+	                console.info(this.x);
+	            },
+	            x: 3
+	        }){
+	            function fn3(){
+	                console.info(this.x);
+	            }
+
+	            // 1,why? 因为with只是将with对象加入到作用域的最前端，而作用域链只是对查找标识符有影响，但对于这个{}代码块的this并不会有影响
+	            // 所以这行代码，就跟放在with外面的效果一致，因为foo是在全局代码中调用的，那么显然this就是global
+	            console.info(this.x);
+	            
+	            console.info(x)//3
+
+
+	            fn1(); // ? 函数内部的标识符返回的引用的base 是这个函数的活动对象，在这种情况下，this->null->global
+	            fn2(); // ? 这个时候fn2是在withobject中找到，那么fn2的引用类型的base是 withobject，this设置为withobject，故返回3
+	            fn3(); // ? 也是1，因为fn3也是定义在foo的活动对象中的，并不是在withobject中，处理情况就跟fn1一样了。
+	        }
+	    }
+	    foo();
+
+
+	总结:对于复杂类型的调用，要理清思路，首先判断括号左边的是引用类型 还是其他类型，
+		如果是其他类型则，this一致是global
+		如果是引用类型，则再根据情况，如果是通过属性访问器，则比较简单，如果是通过标识符，则需要仔细分析返回的引用类型的base。
+
+
+
+
+
+
+
+
