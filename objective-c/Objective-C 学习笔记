@@ -1,0 +1,340 @@
+Objective-C 学习笔记
+
+objective-c基于c语言，增加面向对象的相关特性.cocoa框架由foundation kit, app kit 两部分组成，前者使基础工具库，后者主要使ui库
+高级对象邓。
+
+一.类的定义
+ (1)接口文件h
+ 	o-c中类的定义必须定义个接口（头文件）,包含实例变量类变量 类方法 实例方法邓，接口文件扩展名h。
+	类变量定义在接口外面，实例变量全部定义在花括号中，－开头的方法为实例方法，＋开头的方法为类方法.
+	#import方式导入可以避免互相导入的情况，导入系统库使用<> 导入用户自己的类文件使用""
+	o-c中只有实例方法由访问修饰符号，具体以java类似，其他的类方法等都没有访问修饰符
+		#import <Foundation/Foundation.h>
+		static int t=0; //类变量
+		@interface Fraction: NSObject{//Nsobject 使所有类的顶级类 
+			int numerator; //实例变量定义在花括号中
+			@public int denominator;
+		} 
+		-(void) setNumerator: (int) numerator;//numerator 的 setter 方法 
+		-(void) setDenominator: (int) denominator;
+		-(void) setNumerator: (int) numerator andDenominator: (int) denominator; //一个同时设置两个成员变量的快捷方法 
+		-(int) numerator;//
+		-(int) denominator;//
+		//o－c中 不能使用get为前缀，默认使用变量名称为get方法 
+		-(void) print; 
+		+(void) t; //类方法只能类调用，大部分类方法用来初始化创建类等
+		@end
+		
+ (2)实现文件m
+ 	不需要实现头文件中定义的所有接口，并且业可以添加头文件中没有定义的方法（可以用来隐藏私有的方法，但是编译会给予警告），
+ 		#import "Fraction.h"
+ 		@implementation Fraction
+		-(void) setDenominator: (int) d{
+			denominator=d;
+		} -(void) setNumerator: (int) n andDenominator: (int) d{
+			numerator=n; //可以使用self->numerator＝numerator方式
+			denominator=d;//跟java不同 //不能使用numerator＝numerator方式，方法里面的变量名称冲突时会隐藏实例类的成员变量
+		} 
+		-(int) numerator{
+			return numerator;
+		} 
+		-(void) print{
+			printf("%d/%d\n",numerator,denominator);
+		} 
+		-(void) m{
+			printf("-m:The class variable t is %d\n",++t);
+		} 
+		@end
+		
+ (3)主函数main
+ 	Objective-C 中实例只能使用指针作为变量, 而不能使用值
+ 	获取class的方式[类或者对象 class] [类或者对象 superclasss] NSClassFromString(类名的字符串形式)
+ 	函数把 Class 转换为字符串形式: NSStringFromClass(Class)
+ 		int main(int argc,const char *argv[]){ 
+ 			Fraction *frac=[[Fraction alloc] init]; 
+ 			[frac setNumerator: 3 andDenominator: 5]; 
+ 			[frac print]; 
+ 			NSLog("The denominator of Fraction is %d\n",［frac denominator］); 
+ 			[Fraction t];//调用类方法 ？？？[[Fraction class] t];
+ 			[frac m]; 
+ 			[frac release]; 
+ 			return 0;
+		}
+   
+   
+二。布尔类型与nil
+ (1)布尔类型
+ 	o－c中的布尔bool类型 来表示yes/no ,实际时使用一个8位的整数表示，8位全0则为no，八位不全0则为yes
+ 	不要将bool与整数掺合一起判断.逻辑判断与c一样 数值不为0时为真，为0则为假
+ 	测试结果得出  只有0= no 1＝ yes
+ (2)nil类似java中的null 但是没有空指针异常 可以回应消息
+ (3)description 类似与java toString();
+ 	-(NSString*) description{
+		return @"I am a fraction!";
+	}///在类的实现中重写此方法
+	Fraction *frac=[[Fraction alloc] initWithNumerator: 2 andDenominator: 3]; NSLog(@"%@",frac);//在类的实现中重写此方法 则可以直接打印对象的string，如果没有重写则返回对象的首地址
+ 
+
+三。对象的初始化
+ 	对象的创建分两个步骤alloc,alloc给对象分配存储空间，所有变量确定了内存位置，并被赋初值，0，0。0，no，nil
+ 	init可以重写 
+ 	-(id) init; 
+ 	-(Fraction*) initWithNumerator: (int) numerator ;
+ 	-(id) init{
+		self=[super init];
+		//
+	}
+	-(id) init{
+		self=[super init];//
+	}
+	-(Fraction*) initWithNumerator: (int) n andDenominator: (int) d{ 
+		self=[self 	init];
+		//int
+		if(self){//主要时判断之前的初始化时否出现问题
+			[self setNumerator : n andDenominator: d];
+			return self;
+		}
+	}
+	
+四。异常机制
+
+五。ID与SEL
+ (1)id 可以指向任意类型的类的实例,以下方法判断id的class等
+ 	-(BOOL) isMemberOfClass: (Class) clazz
+		用于判断对象是否是 clazz 类型的实例,但 不包子类的实例
+	-(BOOL) isKindOfClass: (Class) clazz
+		用于判断对象是否是 clazz 类型的实例或 者 clazz 的子类的实例。
+	-(BOOL)	respondsToSelector:	(SEL) selector
+		用于判断类型或者对象是否能够回应某个 方法,这个方法使用选择器表示。
+	+(BOOL) instancesRespondToSelector: (SEL) selector
+		用于判断类型所产生的实例是否能够回应 某个方法,这个方法使用选择器表示。
+	- (id) performSelector: (SEL) selector
+		用于动态调用类型或者对象上的一个方 法。
+ (2)sel
+ 	1.编译时根据方法的名字参数生产唯一的id,这个id就是sel类型，不过类别以及关系 名字参数相同就是同一id
+     2.如果方法带参数那么字符串后面有个冒号
+     3.sel 变量名= @selector(方法名字);--直接在程序里面写上方法的名字
+       sel 变量名 ＝ NSSelectorFromString(方法名字的字符串)--通过方法名字的字符串获取sel
+       NSString *变量名 ＝ NSStringFromSelector(sel参数)--通过sel变量获得方法的名字
+     4.[对象 performSelector:SEL 变量名 withObject:参数 1 withObject:参数 2];
+       //灵活性  可以通过给一个方法传递 sel参数 来让方法动态执行方法
+     5.函数指针；c语言方式 void(*setSkinColor_Func) (id, SEL, NSString*);//id对象 sel方法
+               新方式 IMP say_Func;// (*IMP)(id , SEL,);
+        //使用函数指针在编译时 编译起不知道具体哪个方法所以不会找错误执行时才会出错误
+        //函数指针当作参数传递 具备很强的动态性
+     6。Class（编译成功的类里存在一个变量用于保存这个类的信息）
+            Class 变量名 = [类或者对象 class];//通过向一个类或者对方 class 来或者这类或者对象的class变量
+            Class 变量名 = ［类或者对象 superclass］；//获取这个类或对象的超类的class变量
+            Class 变量名 ＝ NSClassFromString(类名的字符串);/
+            NSString *变量名 ＝ NSStringFromClass(Class 参数  )//通过class类型来获取类的名字
+            //?类的名字是不是之前就有个固定的 还是class赋予的 就是什么???
+     7.类的初始化 alloc+init 或者new(new等于是包含了前面两个步骤)
+     在子类中调用[super init]使超类初始化 若超类是nsobject则不需要
+
+六。类别
+ 可以扩充类的功能，但是不同于继承,实际应用中可以根据不同的模块在各自的模块中进行类别扩充,
+ 类别的实现就是在@interface 名字后面加（），里面写上泪奔的名字，这个名字必须是类唯一的
+ 一个文件离可以写多个类别
+ 类别的头文件可以在。m文件中定义，这样可以达到隐藏的目的.但是运行期仍然可以调用隐藏的类别方法
+ 类别不可以声明新的成员变量，而且如果与原始类方法name相同，则覆盖原始方法,不能在类别中的方法使用super获取类的同名方法
+ ?是否可在原始类中使用？
+ FractionMath.h//起名随意
+	#import "Fraction.h"
+	@interface Fraction (Math1) 
+	-(Fraction*) mul: (Fraction*) f;//乘法,就是传入一个 Fraction 作为参数,与当前的 Fraction 进行计算 -(Fraction*) div: (Fraction*) f;//除法
+
+	@end
+	@interface Fraction (Math2) 
+	-(Fraction*) add: (Fraction*) f;//加法 
+	@end
+ 
+
+七。协议@protocol
+ 类似与java中的接口，运行遵从多个协议（接口）,但是继承关系只运行单继承
+ 多个协议可以定义在同一文件中
+ 	@protocol Printing3 <Printing2> //协议的定义
+ 	-(void) print3; //
+ 	@end//
+ 	@interface Fraction: NSObject <Printing1,Printing3>//遵从协议
+	//main中具体运行 ？
+	Fraction *frac=[[Fraction alloc] initWithNumerator: 3 denominator: 5];
+	<Printing1> p1=frac;//使用 protocol 类型,相当于 JAVA 中使用接口类型作为对象 的引用 
+	／／List list=ArrayList 的实例。
+	//也可以写作 id <Printing1> p1=frac; [p1 print1];
+	id<Printing1,Printing2,Printing3> p2=frac;
+	//从这里可以看出 id 是一个泛型对象,在 id 后面使用<>作为泛型参数可以明确的告诉别人id 当作哪些种协议去使用,当然业可以不写泛型参数。
+	[p2 print2]; [p2 print3];
+	-(BOOL) conformsToProtocol: (Protocol*) prot 用于判断对象是否遵从某 个 protocol。
+	
+八。内存管理(略)
+
+九。Foundation Kit框架常用类
+ (1)字符串
+	1。格式化创建字符串 
+	+(NSString*)	stringWithFormat: @””,...
+		NSString *test ;
+		test = [NSString stringWithFormat:@"your height is %d feet,%d inches",5,11]
+	2.比较两个字符串是否相同，类似与java equals, == 也是比较指针
+	 -(BOOL)	isEqualToString: (NSString*) s
+	 	[string1 isEqualToString string2]
+	3.详细比较两字符串是否相等
+	 -(NSComparisonResult)	compare: (NSString*) s	options: (NSStringCompareOptions) options
+	4.字符串是否以参数s作为前缀
+	 (BOOL)	hasPrefix: (NSString*) s
+	5.字符串是否包含参数s，返回参数为结构体nsrange
+	 -(NSRange)	rangeOfString: (NSString*) s
+	 	//判断 s1 中是否包含 height 
+	 	NSRange range=[s1 rangeOfString: @"height"]; if(!(range.location==NSNotFound)){
+		NSLog(@"The \"height\" is located in %u!",range.location); 
+		NSLog(@"The \"height\" length is %u!",range.length);
+		}
+ (2)NSMutableString,继承自nsstring
+ 	+(NSMutableString*) stringWithCapacity: (int) capacity 进行创建,capacity //指定预先分配的字符串长度，具体大小无所谓
+	-(NSMutableString*)	appendString:	(NSString*) s 
+	//这与 JAVA 的 StringBuffer 的 append 差不多
+	-(void)	deleteCharactersInRange:	(NSRange) range 
+	//这个方法删除指定范围的字符串,常与 rangeOfString 方法联用。
+ (3)数组
+ 	Cocoa 使用 NSArray 表示数组,但是它不能存储基本数据类型、enum、struct、nil,只能存 储 Objective-C 的对象。
+ 	NSArray *array=[NSArray arrayWithObjects:	@"One", @"Two", @"Three", nil]; 	//创建array的一种方法，以nil结束，故数组不能存在nil
+ 	int count=[array count];//获取数组元素的格式,
+ 	int i; for(i=0; i<count;i++){
+		NSLog(@"%@",[array objectAtIndex: i]);
+		//遍历数组元素,objectAtIndex 方法获取指定索引位置的元素。
+	｝
+	NSString *s=@"iPhone,Android,Windows Phone 7"; 
+	array=[s componentsSeparatedByString: @","];//按照一个字符串将字符串拆分为数组。
+	//类似于java中的split
+	s=[array componentsJoinedByString: @" "];//按照一个字符串将数组连接为字符串。 
+	NSLog(s);
+ (4)NSMutableArray数组
+	NSMutableArray 为长度可变的数组,相当于 JAVA 中的 List。 
+	NSMutableArray *mArray=[NSMutableArray arrayWithCapacity: 10]; 
+	[mArray addObject: @"Apple"];//添加数组元素的方法
+	[mArray addObject: @"Google"]; 
+	[mArray addObject: @"MicroSoft"]; 
+	[mArray removeObjectAtIndex: 2];//移除指定索引位置的数组元素
+
+	s=[mArray componentsJoinedByString: @","];//拼接数组元素为字符串 NSLog(s);
+	NSEnumerator *e = [mArray objectEnumerator
+	//获取数组的迭代器,相当于 JAVA 中的 Iterator,reserveObjectEnumerator 用于获取反转 之后的数组迭代器。与 JAVA 一致的地方是你在使用迭代器时,不能对数组进行添加、删除 操作。 
+	id obj;
+	while(obj=[e nextObject]){ NSLog(@"%@",obj);}//迭代器
+	printf("------------------------------\n"); 
+	for(NSString *ms in mArray){
+		NSLog(@"%@",ms);//类似java中的快速枚举
+	}  //for-each 快速枚举为 Objective-C 2.0 的新特性
+ 	
+ (5)字典／哈希表
+ 	NSDictionary 用于存储 key-value 的数据结构,与 JAVA 中的 Map 类似。 
+ 	NSDictionary *dic=[NSDictionary dictionaryWithObjectsAndKeys: @"Apple", @"A", @"Google", @"G", nil]; 
+ 	//dictionaryWithObjectAndKeys 后的可变参数,每两个为一个 value-key,以 nil 表示结束。 NSLog(@"%@",[dic objectForKey: @"A"]);
+ 	//按照指定的 key 查询 value
+	NSMutableDictionary 表示长度可变的字典。 
+	NSMutableDictionary *mDic=[NSMutableDictionary dictionaryWithCapacity: 10]; [mDic setObject: @"Apple" forKey: @"A"];//添加 value-key 对 
+	[mDic setObject: @"Google" forKey: @"G"]; 
+	[mDic setObject: @"Windows Phone 7" forKey: @"W"]; 
+	[mDic removeObjectForKey: @"W"];//移除指定 key 的 value /*
+	for(id key in mDic){ NSLog(@"%@ : %@",key,[mDic objectForKey: key]);} //快速迭代的 for-each 循环
+
+	NSEnumerator *keyEnum=[mDic keyEnumerator];
+	//获得 key 的枚举器 id key;
+
+	while(key=[keyEnum nextObject]){ 
+		NSLog(@"%@ : %@",key,[mDic objectForKey:key]);
+	}
+	
+ (6)封装类
+ 	o-c容器类都不能存放基本数据类型，cocoa使用NSValue作为封装类,基本数据使用nsnumber来封装
+ 	NSNumber *n1=[NSNumber numberWithChar: 'A']; 
+ 	NSNumber *n2=[NSNumber numberWithInt: 100];//将基本类型转换为nsnumber‘
+ 	[n2 intValue]//将nsnumber转回基本数据
+ 
+ (7)日期类型 NSDate
+ 	NSDate *date=[NSDate date];//获取当前事件
+ 	//根据参数格式化字符串转换为日期类型
+ 	NSCalendarDate *date2=[NSCalendarDate dateWithString:@"26 Apr 2008"
+	calendarFormat:@"%d %b %Y"];
+	NSLog(@"Today is %@!",date2);//日期类型输出为％@
+	//根据参数获取距离当前时间时间差的日期
+	NSDate *date3=[NSDate dateWithTimeIntervalSinceNow: -24*60*60];
+ (8)文件操作  
+   1。NSFileManage
+   NSFileManager * fm;
+   fm=[NSFileManager defaultManager];
+ 	-(Bool) removeFleAtPath:path handler:handler;//删除一个文件
+ 	-(Bool) movePath:from toPath:to handler:handler;//移动一文件
+ 	-(Bool) fileExistsAtPath:path ;//测试文件是否存在
+ 	-(Bool) isReadableFileAtPath:path ;//测试存在并可读
+ 	-(Bool) isWriteableFileAtPath:path ;//测试存在并可写
+ 	-(NSDictionary *)fileAttributesAtPath:path //获取文件的字典属性
+ 	//目录操作类似
+   2.枚举目录中的内容
+ 	－（NSArray *）directoryContentsAtPath:path //列出目录内容
+ 	-(NSDirectoryEnumerator *) enumeratorAtPath:path//递归枚举目录
+ 	例；
+ 		path =[fm currentDirectoryAtPath]
+ 		dirEnum = [fm enumeratorAtPath:path]
+ 		while((path = [dirEnum nextObject])!=null){
+ 			NSLog(@"%@",path);
+ 			//[fm fileExistsAtPath:path isDirectory:&flag];判断是否为目录
+ 			//if(flag==YES) 
+ 			//	[dirEnum skipDescendents] 跳出循环
+ 		}
+   3.路径操作类NSPathUtilities（略）
+   4。基本文件操作NSFileHandle
+   	首先打开文件获取nsfilehandle对象，进行i.o操作 读取写入文件等，关闭文件
+  
+十。多线程
+ (1)原始线程NSThread
+ 	- (id)	init; 
+ 	- (id)	initWithTarget: (id) target selector: (SEL)selector object: (id) argument; 
+ 	//第一个参数指定目标对象,一般情况下就是当前的实例 self。
+ 	//第二个参数指定要运行的方法, 相当于 JAVA 中的 run 方法。第三个参数一般为 nil。 
+ 	+(void) detachNewThreadSelector:(SEL)aSelector
+	toTarget:(id)aTarget withObject:(id)anArgument 
+	//类方法参数于上一个类似，不需要release，
+	//线程启动start方法，结束exit，结束前需要使线程计数器归0
+ (2)NSCondition
+ 	需要同步的代码lock，完成后unlock
+ 	@synchronized(要加锁的对象){//指令同步方式
+		同步执行的代码
+	}
+ (3)与主线程的交互
+ 	分线程不能直接调用主线程的方法 需要在run中使用如下的方法调用
+ 	- (void)	performSelectorOnMainThread: (SEL)	aSelector
+		withObject: (id)	arg	waitUntilDone: (BOOL)	wait
+	[self performSelectorOnMainThread: @selector(moveText)
+	withObject: nil waitUntilDone: NO];//例子
+ (4)线程池
+ 	NSOperation 类似java的runnable mian方法存放要执行的操作
+ 	NSOperationQueue 线程池队列 ,将上面的opertion加入队列则实现线程池
+ 	
+ 	NSOperation *operation2=[[MyOperation alloc] initWithNum: 2]; 
+ 	[operation2 autorelease]; 
+ 	NSOperationQueue *queue=[[NSOperationQueue alloc] init]; 
+ 	[queue setMaxConcurrentOperationCount: 2]; //设置最打并行处理量超过这个量其他的进入等待对了
+ 	[queue addOperation: operation1];//将任务添加到队列 
+ 	[queue addOperation: operation2]; 
+ 	[NSThread sleepForTimeInterval: 15]; 
+ 	[queue release]; [pool release];
+ 	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
