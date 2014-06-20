@@ -1,0 +1,111 @@
+jquery ui sortable revert 再滚动的情况下位置错误
+
+首先看看sortable revert的核心代码:
+
+
+
+		if(this.options.revert) {
+			var that = this,
+				cur = this.placeholder.offset(),
+				axis = this.options.axis,
+				animation = {};
+
+			if ( !axis || axis === "x" ) {
+				animation.left = cur.left - this.offset.parent.left - this.margins.left + (this.offsetParent[0] === document.body ? 0 : this.offsetParent[0].scrollLeft);
+			}
+			if ( !axis || axis === "y" ) {
+				animation.top = cur.top - this.offset.parent.top - this.margins.top + (this.offsetParent[0] === document.body ? 0 : this.offsetParent[0].scrollTop);
+			}
+            console.log('sort revert top is:'+animation.top);
+			this.reverting = true;
+			$(this.helper).animate( animation, parseInt(this.options.revert, 10) || 500, function() {
+				that._clear(event);
+			});
+		} else {
+			this._clear(event, noPropagation);
+		}
+
+		jQuery.fn.offset = function( options ) {
+			if ( arguments.length ) {
+				return options === undefined ?
+					this :
+					this.each(function( i ) {
+						jQuery.offset.setOffset( this, options, i );
+					});
+			}
+
+			var docElem, win,
+				elem = this[ 0 ],
+				box = { top: 0, left: 0 },
+				doc = elem && elem.ownerDocument;
+
+			if ( !doc ) {
+				return;
+			}
+
+			docElem = doc.documentElement;
+
+			// Make sure it's not a disconnected DOM node
+			if ( !jQuery.contains( docElem, elem ) ) {
+				return box;
+			}
+
+			// If we don't have gBCR, just use 0,0 rather than error
+			// BlackBerry 5, iOS 3 (original iPhone)
+			if ( typeof elem.getBoundingClientRect !== core_strundefined ) {
+				box = elem.getBoundingClientRect();
+			}
+			win = getWindow( doc );
+			return {
+				top: box.top + win.pageYOffset - docElem.clientTop,
+				left: box.left + win.pageXOffset - docElem.clientLeft
+			};
+		};
+
+
+1.padding的情况
+
+如果sortable是relative，
+a:scrollTop =0 的情况下：
+	cur.top = 236;这个高度是包含padding的高度
+b:scrollTop =180 的情况下:
+	cur.top = 56; 这个top是取place的位置到document的高度
+	因为parent是relative，所以padding无效··故56比真正的位置要靠前
+
+如果sortable的postion未设置relative:
+a:scrollTop =0 的情况下：
+	cur.top = 236;这个高度是包含padding的高度
+b:scrollTop =194 的情况下:
+	cur.top = 42; 
+	这个时候，因为parent未设置relative，所以是相对于body的位置，故42的高度也是正常的
+
+
+
+	<div id="scroll">
+		    <div id="content">
+		        <ul id="sortable">
+		            <li>Item 1</li>
+		            <li>Item 2</li>
+		            <li>Item 3</li>
+		        </ul>
+		    </div>
+		</div>
+
+		#scroll { overflow: auto; height: 300px; }
+        #content { height:600px; }
+        #sortable { position: relative; list-style: none; padding: 200px 0; }
+        #sortable li { border: 1px solid black; }
+
+2.未设置relative的情况下，
+不会存在这个问题，因为如果从parent到document都未设置relative，那么都是相对于document，这样肯定没有问题。
+
+3.如果设置了relative
+看下面代码：
+top = place到客户端顶部的巨鹿 - 父结点的top  - margin的top + 父结点descroll
+animation.top = cur.top - this.offset.parent.top - this.margins.top + (this.offsetParent[0] === document.body ? 0 : this.offsetParent[0].scrollTop);
+
+如果父结点没有scroll，但是又被外层的div scroll了一部分，
+
+
+
+	

@@ -40,4 +40,11 @@ $('#c_b input[type="checkbox"]:checked').each(function() {
 
  8. == 与 === 的区别，
  	why null == undefined : is true;
+
+
+ 5.var size = ['aaa','bbb'],
+ 	var operate = 'shift';
+
+ 	size[operator]() = 2;
+ 	size['shift']() = 'bbb';
  	
