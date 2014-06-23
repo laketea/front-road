@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="GBK"?>
+<!-- 指定Hibernate映射文件的DTD信息 -->
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Hibernate映射文件的根元素 -->
+<hibernate-mapping package="com.szrz.domain">
+	<class	name="GuestBook"	table="GuestBook_table">
+		<!-- 使用只读缓存 -->
+		
+		<!-- 映射标识属性 -->
+		<id	name="id" type="integer" column="id">
+			<!-- 指定使用identity主键生成策略 -->
+			<generator class="identity"/>
+		</id>
+		
+		<!-- 映射普通属性 -->
+		<property name="title" column="title" type="string" length="50"/>
+		<property name="content" column="content" type="string" length="50"/>
+		<property name="typeId" column="typeId" type="string" length="50"/>
+		<property name="typeName" column="typeName" type="string" length="50"/>
+		<property name="userId" column="userId" type="string" length="50"/>
+		<property name="userName" column="userName" type="string" length="50"/>
+		<property name="userNick" column="userNick" type="string" length="50"/>
+		<property name="replyContent" column="replyContent" type="string" length="50"/>
+		<property name="replyTime" column="replyTime" type="string" length="50"/>
+		<property name="guestBookTime" column="guestBookTime" type="string" length="50"/>
+		<property name="status" column="status" type="string" length="50"/>
+
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+                            "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+                            "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+
+<!-- DO NOT EDIT: This is a generated file that is synchronized -->
+<!-- by MyEclipse Hibernate tool integration.                   -->
+<!-- Created Sun Jan 29 11:50:19 GMT-08:00 2006                         -->
+<hibernate-mapping package="com.bookstore.po">
+
+    <class name="Gods" table="gods">
+        <id name="id" column="id" type="long">
+            <generator class="increment"/>
+        </id>
+ 
+        <property name="name" column="name" type="string"  not-null="true" />
+		<property name="minphoto" column="minphoto" type="string"  not-null="true" />
+		<property name="maxphoto" column="maxphoto" type="string"  not-null="true" />
+		<property name="sellcount" column="sellcount" type="long"   />
+		<property name="startdate"  column="startdate" type="date"  not-null="true" />
+		<property name="enddate" column="enddate" type="date"  not-null="true" />
+        <property name="discript" column="discript" type="text"  not-null="true" />
+        <property name="content" column="content" type="text"  not-null="true" />
+        <property name="oldprice" column="oldprice" type="double" not-null="true" />
+        <property name="newprice" column="newprice" type="double"  not-null="true" />
+		<property name="firststatus" column="firststatus" type="long"   />
+		<property name="defaultstatus" column="defaultstatus" type="long"   />
+		<property name="status" column="status" type="long"   />
+        <property name="hourcount" column="hourcount" type="long"   />
+        <property name="first" column="first" type="long"   />
+        <property name="second" column="second" type="long"   />
+        <property name="sn" column="sn" type="long"   />
+        <property name="point" column="point" type="long"   />
+        <property name="firstname" column="firstname" type="string"   />
+        <property name="secondname" column="secondname" type="string"   />
+        <property name="maxphoto_a" column="maxphoto_a" type="string" not-null="false"   />
+        <property name="maxphoto_b" column="maxphoto_b" type="string"  not-null="false" />
+        <property name="maxphoto_c" column="maxphoto_c" type="string"  not-null="false" />
+        <property name="maxphoto_d" column="maxphoto_d" type="string" not-null="false"  />
+    </class>
+    
+</hibernate-mapping>

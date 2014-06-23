@@ -1,0 +1,19 @@
+<%@ page language="java" pageEncoding="GBK" contentType="text/html;charset=GBK"%>  
+<%@ include file="/admin/common/include.jsp"%> 
+
+<form onsubmit="return validateCallback(this, dialogAjaxDone)" class="pageForm required-validate" action="/szrz/admin/${name}!update.action?navTabId=${name}List&callbackType=closeCurrent" method="post" novalidate="novalidate">
+		
+		<input type="hidden" name="id" value="${${name}.id}">
+
+	<div layouth="58" class="pageFormContent" style="height: 203px; overflow: auto;" >
+		
+		${properties_input}
+	</div>
+			
+	<div class="formBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">ÐÞ¸Ä</button></div></div></li>
+				<li><div class="button"><div class="buttonContent"><button class="close" type="button">È¡Ïû</button></div></div></li>
+			</ul>
+		</div>
+</form>

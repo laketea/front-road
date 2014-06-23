@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>省市区联动菜单</title>
+<script type="text/javascript" src="loadxml.js"></script>
+<script type="text/javascript" src="C_area.js"></script>
+<script type="text/javascript">
+	window.onload = function() {
+		
+
+		//省市地区联动（无默认值）
+		var lp = new Province('lp', 'lp');
+		var lc = new City('lc', 'lc');
+		var la = new Area('la', 'la', '', false);
+		lp.linkCity(lc);
+		lc.linkArea(la);
+
+		
+
+	}
+</script>
+</head>
+<body>
+
+<br />
+<fieldset><legend>市地区联动</legend> 无默认值： <span id="lp"></span><span
+	id="lc"></span> <span id="la"></span> </fieldset>
+	<input type="text" name="test" id="test">
+	
+</body>
+</html>

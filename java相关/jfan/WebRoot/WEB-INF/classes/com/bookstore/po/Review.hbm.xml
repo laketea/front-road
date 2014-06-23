@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+                            "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+                            "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+
+<!-- DO NOT EDIT: This is a generated file that is synchronized -->
+<!-- by MyEclipse Hibernate tool integration.                   -->
+<!-- Created Sun Jan 29 11:50:19 GMT-08:00 2006                         -->
+<hibernate-mapping package="com.bookstore.po">
+
+    <class name="Review" table="review">
+        <id name="id" column="id" type="long">
+            <generator class="increment"/>
+        </id>
+ 
+        <property name="godsid" column="godsid" type="long"  not-null="true" />
+		<property name="godsname" column="godsname" type="string"  not-null="true" />
+		<property name="userid" column="userid" type="long"  not-null="true" />
+		<property name="username" column="username" type="string"  not-null="true" />
+		<property name="title" column="title" type="string"  not-null="true" />
+		<property name="advantage" column="advantage" type="string"  not-null="true" />
+		<property name="defect" column="defect" type="string"  not-null="true" />
+        <property name="view" column="view" type="string" />
+        <property name="redate" column="redate" type="date"  />
+        <property name="orderdate" column="orderdate" type="string" />
+        <property name="orderitemid" column="orderitemid" type="long" />
+    </class>
+    
+</hibernate-mapping>

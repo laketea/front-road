@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+
+<struts-config>
+  <data-sources />
+  <form-beans>
+	<form-bean name="newsForm"
+			type="com.bookstore.form.NewsForm" />
+  	<form-bean name="planForm"
+			type="com.bookstore.form.PlanForm" />
+	<form-bean name="testForm"
+			type="com.bookstore.form.TestForm" />
+	<form-bean name="adminForm"
+			type="com.bookstore.form.AdminForm" />
+	<form-bean name="userForm"
+			type="com.bookstore.form.UserForm" />
+	<form-bean name="cartForm"
+			type="com.bookstore.form.CartForm" />
+	<form-bean name="orderForm"
+			type="com.bookstore.form.OrderForm" />
+	<form-bean name="godsForm"
+			type="com.bookstore.form.GodsForm" />
+  </form-beans >
+  <global-exceptions />
+  
+  <global-forwards >
+    <forward name="error" path="/error.jsp" />
+  </global-forwards >
+  
+  <action-mappings>
+	<action
+      attribute="NewsForm"
+      input="/admin_relax_add.jsp"
+      name="newsForm"
+      parameter="method"
+      path="/newsAction"
+      scope="request"
+      type="com.bookstore.action.NewsAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/admin_relax.jsp" />
+      <forward name="modify" path="/admin_relax_mod.jsp" />
+      <forward name="teacher" path="/admin_teacher.jsp" />
+      <forward name="relax" path="/admin_relax.jsp" />
+      <forward name="default" path="/admin_default.jsp" />
+      <forward name="def" path="/admin_default.jsp" />
+      <forward name="zs" path="/admin_zs.jsp" />
+      <forward name="modify_def" path="/admin_default_mod.jsp" />
+      <forward name="modify_tea" path="/admin_teacher_mod.jsp" />
+      <forward name="modify_rel" path="/admin_relax_mod.jsp" />
+      <forward name="modify_zs" path="/admin_zs_mod.jsp" />
+      <forward name="test" path="/news_test.jsp" />
+    </action>
+    
+    
+    
+    
+    <action
+      attribute="TestForm"
+      input="/admin_test_mod.jsp"
+      name="testForm"
+      parameter="method"
+      path="/testAction"
+      scope="request"
+      type="com.bookstore.action.TestAction"
+      validate="false">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/admin_test.jsp" />
+      <forward name="modify" path="/admin_test_mod.jsp" />
+      <forward name="test" path="/plan_test.jsp" />
+      <forward name="search" path="/admin_test.jsp?columnid=3" />
+    </action>
+    
+    <action
+      attribute="AdminForm"
+      input="/admin_login.jsp"
+      name="adminForm"
+      parameter="method"
+      path="/adminAction"
+      scope="request"
+      type="com.bookstore.action.AdminAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/admin_admin.jsp" />
+      <forward name="loginsuccess" path="/admin.jsp" />
+      <forward name="test" path="/plan_test.jsp" />
+    </action>
+    
+    
+    <action
+      attribute="GodsForm"
+      input="/admin_book_add.jsp"
+      name="godsForm"
+      parameter="method"
+      path="/godsAction"
+      scope="request"
+      type="com.bookstore.action.GodsAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/admin_book.jsp" />
+      <forward name="test" path="/plan_test.jsp" />
+      <forward name="modify" path="/admin_book_mod.jsp" />
+      <forward name="sysmail" path="/admin_zs.jsp?columnid=1" />
+      <forward name="syscontent" path="/admin_zs.jsp?columnid=2" />
+      <forward name="sysimg" path="/admin_zs.jsp?columnid=3" />
+      <forward name="sn" path="/admin_book.jsp?columnid=5" />
+      
+    </action>
+    
+    <action
+      path="/bookAction"
+      type="com.bookstore.action.LogoutAction"
+      validate="false">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/admin_book.jsp" />
+      <forward name="test" path="/plan_test.jsp" />
+      <forward name="modify" path="/admin_book_mod.jsp" />
+    </action>
+    
+    
+    
+    <action
+      attribute="UserForm"
+      input="/reg.jsp"
+      name="userForm"
+      parameter="method"
+      path="/userAction"
+      scope="request"
+      type="com.bookstore.action.UserAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="loginerror" path="/login.jsp?arg=1" />
+      <forward name="cartloginerror" path="/orderlogin.jsp?arg=1" />
+      <forward name="yzmerror" path="/login.jsp?arg=3" />
+      <forward name="nojihuo" path="/login.jsp?arg=2" />
+      <forward name="loginerrorcz" path="/login.jsp?arg=4" />
+      <forward name="regerrorcode" path="/reg.jsp?arg=11" />
+      <forward name="regerroron" path="/reg.jsp?arg=12" />
+      <forward name="regerror" path="/reg.jsp?arg=13" />
+      <forward name="nojihuo" path="/login.jsp?arg=2" />
+      <forward name="success" path="/reg.jsp" />
+      <forward name="loginsuccess" path="/userorder.jsp" />
+      <forward name="cartsuccess" path="/cart.jsp" />
+      <forward name="delfavsuccess" path="/userfav.jsp" />
+      <forward name="favsuccess" path="/userfav.jsp" />
+      <forward name="accountsuccess" path="/useraccount.jsp?tag=1" />
+      <forward name="contactsuccess" path="/usercontact.jsp" />
+      <forward name="loginsuccess" path="/userorder.jsp" />
+      <forward name="relogin" path="/login.jsp" />
+      <forward name="checkright" path="/submitorder.jsp" />
+      <forward name="adminsucess" path="/admin_user.jsp" />
+      <forward name="addsuccess" path="/useraddress.jsp" />
+      <forward name="regsuccess" path="/reg_success.jsp" />
+      <forward name="ordersuccess" path="/submitorder.jsp" />
+      <forward name="subsucessa" path="/admin_subject.jsp?columnid=1" />
+      <forward name="subsucessb" path="/admin_subject.jsp?columnid=2" />
+    </action>
+    
+    <action
+      attribute="OrderForm"
+      input="/submitorder.jsp"
+      name="orderForm"
+      parameter="method"
+      path="/orderAction"
+      scope="request"
+      type="com.bookstore.action.OrderAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/reg.jsp" />
+      <forward name="loginsuccess" path="/usercenter.jsp" />
+      <forward name="delfavsuccess" path="/userfav.jsp" />
+      <forward name="favsuccess" path="/userfav.jsp" />
+      <forward name="submitsuccess" path="/ordersucess.jsp" />
+      <forward name="accountsuccess" path="/useraccount.jsp?tag=1" />
+      <forward name="login" path="/login.jsp" />
+      <forward name="cklogin" path="/orderlogin.jsp" />
+      <forward name="adminsuccess" path="/admin_order.jsp" />
+       <forward name="userorder" path="/userorder.jsp" />
+      <forward name="paysuccess" path="/admin_order.jsp?columnid=2" />
+      <forward name="sendsuccess" path="/admin_order.jsp?columnid=3" />
+      <forward name="submitorder" path="/submitorder.jsp" />
+      <forward name="userdel" path="/buy.jsp" />
+    </action>    
+    
+    <action
+      attribute="CartForm"
+      input="/cart.jsp"
+      name="cartForm"
+      parameter="method"
+      path="/cartAction"
+      scope="request"
+      type="com.bookstore.action.CartAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="success" path="/cart.jsp" />
+      <forward name="cartmax" path="/cart.jsp?arg=110" />
+      <forward name="cartmax2" path="/cart.jsp?arg=111" />
+      <forward name="detailsuccess" path="/submitorder.jsp" />
+      <forward name="login" path="/login.jsp?orderid=1" />
+    </action>
+    
+    <action
+      attribute="reviewForm"
+      input="/review.jsp"
+      name="reviewForm"
+      parameter="method"
+      path="/reviewAction"
+      scope="request"
+      type="com.bookstore.action.ReviewAction"
+      validate="true">
+      <forward name="error" path="/error.jsp" />
+      <forward name="nosuccess" path="/contacts.jsp" />
+      <forward name="usersucess" path="/usersuggest.jsp" />
+      <forward name="userdelssuccess" path="/usersuggest.jsp" />
+      <forward name="admindelssuccessa" path="/admin_suggest.jsp?columnid=1" />
+      <forward name="reply" path="/admin_suggest.jsp?columnid=1" />
+      <forward name="admindelssuccessb" path="/admin_suggest.jsp?columnid=2" />
+      <forward name="userdelsuccess" path="/userreview.jsp" />
+      <forward name="admindelsuccess" path="/admin_review.jsp" />
+      <forward name="sucess" path="/usereview.jsp" />
+      <forward name="login" path="/login.jsp?orderid=1" />
+      
+    </action>
+    
+    <action
+      path="/logout"
+      type="com.bookstore.action.LogoutAction"
+      validate="false">
+      <forward name="success" path="/admin_login.jsp" />
+    </action>
+    
+    <action
+      path="/voteAction"
+      type="com.bookstore.action.VoteAction"
+      validate="false">
+      <forward name="success" path="/vote_date.jsp" />
+    </action>
+    
+    <action
+      path="/guestAction"
+      type="com.bookstore.action.GuestAction"
+      parameter="method"
+      validate="false">
+      <forward name="success" path="/guest_book.jsp" />
+      <forward name="adminsuccess" path="/admin_agents.jsp?columnid=2" />
+      <forward name="confirmsuccess" path="/guest_book.jsp" />
+    </action>
+    
+    
+    
+  </action-mappings >
+  <message-resources parameter="com.yourcompany.struts.ApplicationResources" />
+	<plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+        <set-property property="pathnames" value="/WEB-INF/validator-rules.xml,
+                                                  /WEB-INF/validation.xml"/>
+      </plug-in>
+</struts-config>
+

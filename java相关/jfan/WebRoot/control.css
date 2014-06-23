@@ -1,0 +1,118 @@
+/* CSS Document */
+a:link,a:visited{
+	text-decoration:none;
+	color:#006;
+	font-size: 12px;
+}
+a:hover{
+	text-decoration:underline;
+	color:#0033CC;
+	font-size: 12px;
+}
+.menuUL{
+	list-style:none;
+	margin:0px;
+	padding:0px;
+	background-image: url(images/Control/menub.jpg);
+}
+.menuA:link,.menuA:visited{
+	width:100%;
+	height:35px;
+	display:block;
+	font-size:12px;
+	color:#fff;
+	text-decoration:none;
+	background-image: url(images/Control/menubutton.jpg);
+	background-repeat: repeat-y;
+	background-position: 4px 0px;
+}
+.menuA:hover{
+ background:url('images/Control/menubutton.jpg') no-repeat 4px -36px;
+ color:#fff;
+ text-decoration:none;
+}
+
+.menuAS:link,.menuAS:visited{
+ width:100%;
+ height:35px;
+ display:block;
+ background:url('images/Control/menubutton.jpg') no-repeat 4px -72px;
+ font-size:12px;
+ color:#000;
+ text-decoration:none;
+ font-weight:bold;
+}
+.MenuIcon{
+ margin:1px 6px -12px 12px;
+}
+.CTitle{
+	background:#3E70A6;
+	padding:5px;
+	text-align:left;
+	color:#FFFFFF;
+	font-size:13px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.CContent{
+	border-top: 1px solid #666666;
+	border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	border-left: 1px solid #666666;
+	background-color: #FFFFFF;
+}
+.CPanel{
+ padding:5px;
+ font-size:10px;
+ font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.SubMenu{
+	padding: 4px;
+	border-bottom: 1px solid #003366;
+	font-size:12px;
+	margin:-5px -5px 2px -5px;
+	background-color: #E6EBF7;
+}
+
+.SubMenus{
+	padding: 4px;
+	border-bottom: 1px solid #003366;
+	font-size:12px;
+	margin:-5px -5px 2px -5px;
+	background-color: #E6EBF7;
+}
+
+.TDHead{
+	border-bottom:1px solid #999;
+	height:12px;
+	font-size:12px;
+	background-image: url(images/Control/M.jpg);
+}
+.TablePanel{
+	border:1px solid #999;
+	font-size: 12px;
+}
+input.text{
+ border:1px solid #4f6480;font-size:12px;font-family: Verdana, Arial, Helvetica, sans-serif;height:18px
+}
+button{background:#fff;border:1px solid #999;padding:2px 2px 0px 2px;margin:4px;border-width:1px 3px 1px 3px;}
+input.button{
+ background:#fff;border:1px solid #999;padding:2px 2px 0px 2px;margin:4px;border-width:1px 3px 1px 3px;
+}
+input.buttonActive{
+	color: #FFFFFF;
+	background-color: #5C71AD;
+	border: 1px solid #000066;
+	height:20px;
+	cursor:default;
+}
+input.buttonUnActive{
+	color: #143E76;
+	background-color: #CCD8E6;
+	border: 1px solid #A4B9D2; 
+	height:20px;
+	cursor:pointer;
+ background:url(../images/Control/UAb.jpg)	
+	
+}
+textarea{ border:1px solid #4f6480;font-size:12px;font-family: Verdana, Arial, Helvetica, sans-serif;}
+.redhat {color: #990000; font-weight: bold; }

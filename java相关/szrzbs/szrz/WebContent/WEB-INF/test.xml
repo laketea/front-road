@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN" "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+    <!--  <include file="struts-default.xml"/> -->
+	<!-- 是否显示详细错误信息 -->
+	<constant name="struts.devMode" value="true" />
+	<!-- 国际化资源文件名称 -->
+	<constant name="struts.custom.i18n.resources" value="i18n" />
+	<!-- 是否自动加载国际化资源文件  -->
+	<constant name="struts.i18n.reload" value="false" />
+	<!-- convention类重新加载 -->
+	<constant name="struts.convention.classes.reload" value="false" />
+	<!-- 浏览器是否缓存静态内容 -->
+	<constant name="struts.serve.static.browserCache" value="false" />
+	<!-- 配置使用Spring管理Action -->
+	<constant name="struts.objectFactory" value="spring" />
+	<!-- 上传文件大小限制设置 -->
+	<constant name="struts.multipart.maxSize" value="-1" />
+
+	<!-- 主题 -->
+	<constant name="struts.ui.theme" value="simple" />
+	<!-- 编码 -->
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<!-- 后缀 -->
+	<constant name="struts.action.extension" value="action" />
+
+	<!-- 结果资源的路径 -->
+	<constant name="struts.convention.result.path" value="/web/" />
+	<!-- URL资源分隔符 -->
+	<constant name="struts.convention.action.name.separator" value="_" />
+	<!-- spring 缓存机制 -->
+	<constant name="struts.objectFactory.spring.useClassCache" value="false"/>
+	
+	<package name="basePackage" extends="struts-default">
+		<interceptors>
+			<interceptor-stack name="baseStack">
+                <interceptor-ref name="exception" />
+                <interceptor-ref name="alias" />
+                <interceptor-ref name="servletConfig" />
+                <interceptor-ref name="i18n" />
+                <interceptor-ref name="prepare" />
+                <interceptor-ref name="chain" />
+                <interceptor-ref name="debugging" />
+                <interceptor-ref name="scopedModelDriven" />
+                <interceptor-ref name="modelDriven" />
+                <interceptor-ref name="fileUpload" />
+                <interceptor-ref name="checkbox" />
+                <interceptor-ref name="multiselect" />
+                <interceptor-ref name="staticParams" />
+                <interceptor-ref name="actionMappingParams" />
+                <interceptor-ref name="params">
+					<param name="excludeParams">dojo\..*,^struts\..*</param>
+                </interceptor-ref>
+                <interceptor-ref name="conversionError"/>
+                <!-- 配置方法级别的校验 -->
+                <interceptor-ref name="validation">
+                    <param name="excludeMethods">input,back,cancel,browse</param>
+                    <param name="validateAnnotatedMethodOnly">true</param>
+                </interceptor-ref>
+                <interceptor-ref name="workflow">
+                    <param name="excludeMethods">input,back,cancel,browse</param>
+                </interceptor-ref>
+            </interceptor-stack>
+		</interceptors>
+
+		<!-- 配置默认拦截器栈 -->
+		<default-interceptor-ref name="baseStack" />
+
+		<!-- 未到找Action指向页面 -->
+		<default-action-ref name="errorPage" />
+
+        <global-results>
+	      <result name="ajaxDone">/dwztest/ajaxDone.jsp</result>
+	    </global-results>
+	    
+		<action name="errorPage">
+			<result type="redirect">/html/error_page_404.html</result>
+		</action>
+		
+		
+	</package>
+	
+	<!-- 涅磐 action -->
+	<package name="nirvana" extends="basePackage" namespace="/nirvana">
+        <action name="nirvanaAction" class="nirvanaAction">
+		    <result name="userlogin">/nirvana/nirvana_userlogin.jsp</result>
+		    <result name="test">/nirvana/nirvana_test.ftl</result>
+		    <result name="list">/nirvana/nirvana_list.jsp</result>
+		    <result name="addGoods">/nirvana/addGoods.jsp</result>
+		</action>
+    </package>
+    
+    <!-- json 测试action -->
+    <package name="json" extends="struts-default,json-default" namespace="/json">  
+            <action name="jsonAction" class="jsonAction">  
+                <interceptor-ref name="params"/>  
+                <result type="json">
+                   <!--   <param name="root">jsonResult</param> -->
+                      <param name="includeProperties">
+                       goodsList\[\d+\]\.goods_uid,goodsList\[\d+\]\.goods_name
+					</param> 
+                </result>  
+            </action>  
+            
+            <action name="goodAddAction" class="jsonAction">
+	               <result type="json"></result>
+            </action>
+    </package>  
+    
+    
+	
+	
+	<package name="dwz" extends="basePackage" namespace="/dwz">
+        <action name="goodsManagerAction" class="goodsManagerAction">
+            <result name="list">/dwztest/goods_manager_list.jsp</result>
+            <result name="input">/dwztest/goods_manager_input.jsp</result>
+            <result name="addOk" type="redirectAction">goodsManagerList</result>
+        </action>
+        
+        <action name="goodsManagerList" 
+			class="goodsManagerAction" method="list">
+			<result name="list">/dwztest/goods_manager_list.jsp</result>
+		</action>
+    </package>
+    
+</struts>

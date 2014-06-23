@@ -1,0 +1,18 @@
+package com.szrz.dao.impl;
+
+import java.util.*; 
+
+import com.szrz.domain.*;
+import com.szrz.common.hibernate.*;
+import com.szrz.dao.*;
+
+
+/*
+ *${cnname}dao µœ÷¿‡
+ */ 
+public class ${name}DaoHibernate
+	extends GenericHibernateDao<${name}, Integer>
+	implements ${name}Dao
+{
+
+}

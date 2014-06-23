@@ -1,0 +1,29 @@
+package com.zo2zo.dao;
+
+import java.util.List;
+
+import com.zo2zo.domain.${name};
+
+/*
+ *${cnname}dao½Ó¿Ú
+ */
+public interface ${name}Dao {
+	
+
+	${name} get(Integer id);
+
+	Integer save(${name} ${name.Low});
+
+	void update(${name} ${name.Low});
+
+	void delete(${name} ${name.Low});
+
+	void delete(Integer id);
+
+	List<${name}> findAll();
+	
+	List findByPageHql(int pageNo,int pageSize );
+	
+	List findByHql(String sql);
+
+}

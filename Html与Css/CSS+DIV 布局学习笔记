@@ -1,0 +1,193 @@
+CSS+DIV 布局学习笔记
+-------------------------------------------------------------by laketea 2011.10.20
+
+一。XHTML CSS基础知识
+	文档类型：
+		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	语言编码：CSS样式表必须与其他文本一样
+		<meta http-equiv="Content-Type" content="text/html;charset="utf-8"" />
+	CSS样式表的种类：
+		外部样式: <link href="test.css" rel="stylesheet" type="text/css" />
+		内部样式：<style> </style>
+		行内样式：style=""
+		导入样式：@import url("/css/global.css") 一半用于样式表内部
+	CSS优先级：
+		id高于class，后面覆盖前面，指定高于继承，行内样式高于内部或外部样式
+	CSS盒模型组成
+		边界（margin） 边框border 填充padding 内容content 
+		左边界＋左边框＋左填充＋内容＋右填充＋右边界
+		
+		
+二。一列布局
+	一列固定宽度居中：
+		margin:auto;
+	一列自适应宽度居中:
+		width:80%;margin:auto;[设置宽度的百分比相对于浏览器 去除白边需要设置 body:margin:0;]
+	多块布局：
+		上下5px,左右auto［块级元素的垂直相邻外边距会合并］
+		body { margin:0; padding:0;}
+		#header { margin:5px auto; width:500px; height:80px; background:#9F9;}
+		#main { margin:5px auto; width:500px; height:400px; background:#9FF;}
+		#footer { margin:5px auto; width:500px; height:80px; background:#9f9;}
+		
+
+三。二列和三列布局
+	二列布局：
+		<div id="content">------宽度为side main之和 居中则设置margin:0 atuo;
+  			<div id="side">此处显示 id "side" 的内容</div>----float:left;
+  			<div id="main">此处显示 id "main" 的内容</div>----设置左边距为side
+		</div>
+		#content { width:470px; margin:0 auto;}
+		#side { background: #99FF99; height: 300px; width: 120px; float: left; }
+		#main { background: #99FFFF; height: 300px; width: 350px; margin-left: 120px; }
+	块级元素和内联元素:
+		块级元素:p div h1.. ul li table form body等，块级元素默认占据一行,display:inline 将块级元素改为内联
+		内联元素:表单元素 a img span等,只能放在行内 不会造成前后换行.display:block将内联变为块元素.
+	float属性
+		如何元输都可浮动，浮动元素生产一个块级框，需指明宽度否则浮动元素会尽量窄
+		<div id="side"><img src="21.gif" width="192" height="142" /></div>----左浮动
+		<div id="main">文字测试</div>-------超出部分沿图片下方
+		#main { margin-left:202px;}－－－－－margin 若大于side则为main左边距 如小于side则为超出部分的左边距
+	三列自适应宽度
+		<div id="side">此处显示 id "side" 的内容</div>－－－－－左浮动
+		<div id="side1">此处显示 id "side1" 的内容</div>------右浮动
+		<div id="main">此处显示 id "main" 的内容</div>--------中间 必须预留除左右浮动的边距离
+		#side { background: #99FF99; height: 300px; width: 120px; float: left; }
+		#side1 { background: #99FF99; height: 300px; width: 120px; float: right; }
+		#main { background: #99FFFF; height: 300px; margin:0 120px; }
+	三列固定宽度
+		在以上的基础上添加父div #content｛margin:0 auto;｝
+	IE6的3像素bug
+		浮动元素与非浮动元输相邻时 ie6会产生3像素空隙,解决方法 #side 加上 _margin-right:-3px; （其他浏览器显示正常但不符合3c规范）
+		如两个元素固定宽度，最好将右元素固定宽度且向右浮动{?同级元素还是子元素与父元素相邻也会产生这个问题呢？？}
+		
+		
+四。纵向导航菜单及二级弹出菜单
+	纵向列表:
+		body { font-family: Verdana; font-size: 12px; line-height: 1.5; }
+		a { color: #000; text-decoration: none; }
+		a:hover { color: #F00; }
+		#menu { width: 100px; border: 1px solid #CCC; }
+		#menu ul { list-style: none; margin: 0px; padding: 0px; }-------ul有默认样式需要清楚
+		#menu ul li { background: #eee; padding: 0px 8px; height: 26px; line-height: 26px; border-bottom: 1px solid #CCC; }
+		------列表的具体样式在li层进行定义
+	标签的默认样式:
+		body, ul, li, h1, h2, h3, h4, h5, h6, p, form, dl, dt, dd { margin: 0px; padding: 0px; font-size: 12px; font-weight: normal; }
+		ul { list-style: none; }
+		img { border-style: none; }
+	css派生选择器以及css选择器分组
+		＃menu ul li
+		h1,h2,.....
+	二级弹出菜单：
+		#menu { width: 100px; border: 1px solid #CCC; border-bottom:none;}
+		#menu ul { list-style: none; margin: 0px; padding: 0px; }
+		#menu ul li { background: #eee; padding: 0px 8px; height: 26px; line-height: 26px; border-bottom: 1px solid #CCC; position:relative; }
+		#menu ul li ul { display:none; position: absolute; left: 100px; top: 0px; width:100px; border:1px solid #ccc; border-bottom:none; }
+		#menu ul li.current ul { display:block;}
+		#menu ul li:hover ul { display:block;}
+		<li><a href="#">div+css教程</a>－－－－－UL跟a在同一层
+			<ul>
+				<li><a href="#">新手入门</a></li>
+				<li><a href="#">视频教程</a></li>
+				<li><a href="#">常见问题</a></li>
+			</ul>
+		</li>
+	相对定位与绝对定位：
+		relative: 元素 如果设置 水平垂直位置，则相对与他的原始起点移动，且移动元素后元素仍然占据原来的空间，so可能会覆盖其他框
+		absolute：元素相对与浏览器左上角，脱离文档流 不占据空间
+		父容器相对子容易绝对后，子元素相对于容器左上角
+		相对与绝对的定位需要使用top right bottom left来定位，且这四个元素之音在该元素使用了定位后才生效，另外4元输只能使用相邻的两个
+		
+五。超链接伪类
+	链接转换伪块级元素： display:bloc 可获取更大的点击区域,可设置宽度以高度
+	CSS制作按钮：设置块元素
+		a { display: block; height: 34px; width: 107px; line-height: 2; text-align: center; background: url(/upload/2010-08/14/014304_btn_bg.gif) no-repeat 0px 0px; color: #d84700; font-size: 14px; font-weight: bold; text-decoration: none; padding-top: 3px; }
+		a:hover { background: url(/upload/2010-08/14/014304_btn_bg_hover.gif) no-repeat 0px 0px;}
+	首字下沉：
+		p { width: 400px; line-height: 1.5; font-size: 14px; }
+		p:first-letter { font-family: "microsoft yahei"; font-size: 40px; float: left; padding-right: 100px; line-height: 1; }
+	
+
+六。HTML列表
+	有序以及无序列表:ul无序 ol有序
+	图片定义符号样式：一种时定义ul的style 一种时定义li的背景
+		#layout ul { list-style: none; }
+		#layout ul li { background: url(/upload/2010-08/17/icon.gif) no-repeat 0px 4px; padding-left: 20px; }
+	横向图文列表
+		body { margin:0 auto; font-size:12px; font-family:Verdana; line-height:1.5;}
+		ul,dl,dt,dd,h1,h2,h3,h4,h5,h6,form { padding:0; margin:0;}
+		ul { list-style:none;}
+		#layout ul li { width:72px; float:left; margin:20px 0 0px 20px; display:inline; text-align:center;}
+		// li设置为左浮动
+		#layout ul li a { display:block;}
+		#layout ul li a img { padding:1px; border:1px solid #e1e1e1; margin-bottom:3px;}
+		//将img设置为块元素后 英文字符会在下面而不是右边
+		#layout ul li a:hover img { padding:0px; border:2px solid #f98510;}
+		<li><a href="#"><img src="/pic.jpg" width="68" height="54" />三亚</a></li>----图片在a里面
+	浮动后父容器高度自适应：
+		当容器内元素都浮动后，高度不会随内部元素高度的增加而增加，造成内容的显示超出了容易，
+		overflow:auto; zoom:1;使用此样式可以解决这个问题
+	IE6双倍边距bug:浮动后，最左侧显示为双倍边距，此时需应用样式：display:inline；
+	
+	
+七。横向列表
+	横向列表菜单：
+		#menu { width:370px; margin:0 auto; border: 1px solid #CCC; height:26px; background: #eee;}
+		#menu ul { list-style: none; margin: 0px; padding: 0px; }
+		#menu ul li { float:left;}
+		#menu ul li a { display:block; padding: 0px 8px; height: 26px; line-height: 26px; float:left;}
+		//IE6下增加float
+		#menu ul li a:hover { background:#333; color:#fff;}
+	CSSSprites技术:#menu ul li a { background:#ccc url(images/nav_bg2.gif) 0 0 no-repeat; }
+		0 0 前面0是左右 后面0是上下
+		#menu { width:500px; height:28px; margin:0 auto; border-bottom:3px solid #E10001;}
+		#menu ul { list-style: none; margin: 0px; padding: 0px; }
+		#menu ul li { float:left; margin-left:2px;}
+		#menu ul li a { display:block; width:87px; height:28px; line-height:28px; text-align:center; background:url(/upload/2010-08/17/091033_nav_bg.gif) 0 -28px no-repeat; font-size:14px;}
+		#menu ul li a:hover { background:url(/upload/2010-08/17/091033_nav_bg.gif) 0 -56px no-repeat;}
+		#menu ul li a#current { background:url(/upload/2010-08/17/091033_nav_bg.gif) 0 0 no-repeat; font-weight:bold; color:#fff;}
+	
+	
+八。下拉及多级弹出菜单
+	清除二级菜单继承自一级菜单得样式。
+		#menu { width:500px; height:28px; margin:0 auto; border-bottom:3px solid #E10001;}
+		#menu ul { list-style: none; margin: 0px; padding: 0px; }
+		#menu ul li { float:left; margin-left:2px;}
+		#menu ul li a { display:block; width:87px; height:28px; line-height:28px; text-align:center; background:url(http://www.aa25.cn/upload/2010-06/27/nav_bg2.gif) 0 0 no-repeat; font-size:14px;}
+		#menu ul li a:hover { background:url(http://www.aa25.cn/upload/2010-06/27/nav_bg3.gif) 0 0 no-repeat;}
+		#menu ul li a#current { background:url(http://www.aa25.cn/upload/2010-06/27/nav_bg1.gif) 0 0 no-repeat; font-weight:bold; color:#fff;}
+		#menu ul li ul { border:1px solid #ccc; display:none; position:absolute;}
+		#menu ul li ul li { float:none; width:87px; background:#eee; margin:0;}
+		//清除二级菜单得浮动
+		#menu ul li ul li a { background:none;}
+		//清楚二级菜单得背景
+		#menu ul li ul li a:hover { background:#333; color:#fff;}
+		#menu ul li:hover ul { display:block;}
+		#menu ul li.sfhover ul { display:block;}
+	按钮自适应宽度：
+		a { display: block; float:left; margin:5px; height: 37px;line-height: 37px; text-align: center; background: url(btn_bg.gif) no-repeat 0px 0px; color: #d84700; font-size: 14px; font-weight: bold; text-decoration: none; padding-left:18px; }
+		a span { display:block; background: url(btn_bg.gif) no-repeat right 0px; padding-right:20px;}
+		a:hover { background: url(btn_bg.gif) no-repeat 0px -37px;}
+		a:hover span{ background: url(btn_bg.gif) no-repeat right -37px;}
+	
+	
+九。CSS表单设计
+	文本框图片美化按钮:
+		.area { border:1px solid #F90; overflow:auto; background:#fff url(bg_9_1.gif) right bottom no-repeat; width:99%; height:100px;}
+		//overflow：auto 当文本超过高度时显示滚动
+	下拉列表样式:IE6只对列表背景跟宽度样式生效 IE8增加对边框跟高度得支持 
+	LABLE标签：点击文本光标会定位到相对得表单上
+		<label for="name">姓名：</label>
+		<input type="text" name="name" id="name" />
+		#search * { vertical-align:middle;}－－－－加＊号居中兼容
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

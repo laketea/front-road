@@ -1,0 +1,127 @@
+
+package com.szrz.action; 
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import com.szrz.common.hibernate.Page;
+import com.szrz.domain.${name};
+import com.szrz.service.${name}Manager;
+
+
+public class ${name}Action extends BaseAction {
+	
+	protected ${name}Manager mgr;
+	
+	public List<${name}> ${name.Low}Lst ;
+	
+	public ${name} ${name.Low};
+	
+	public Integer id;
+	
+	public String ids;
+
+	public void set${name}Manager(${name}Manager mgr)
+	{
+		this.mgr = mgr;
+	}
+	
+	/*
+	 * ${cnname}列表
+	 */
+	public String list(){
+		int pageNum = this.getPageNum() > 0 ? this.getPageNum() - 1 : 0;
+		Page page = mgr.findByPage(get${name}(),pageNum, getNumPerPage());
+		List<${name}> ss =(List<${name}>)page.getList();
+		set${name}Lst(ss);
+		this.setTotalCount(page.getTotalRecords());
+		return "list";
+	}
+	
+	/*
+	 * 删除${cnname}
+	 */
+	public String delete(){
+		mgr.delete(getId());
+		return ajaxForwardSuccess("操作成功!");
+	}
+	
+	/*
+	 * 添加${cnname}
+	 */
+	public String add(){
+		mgr.add(get${name}());
+		return ajaxForwardSuccess("操作成功!");
+	}
+	
+	/*
+	 * 编辑${cnname}
+	 */
+	public String edit(){
+		 ${name.Low} = mgr.get(getId());	
+		return "edit";
+	}
+	
+	/*
+	 * 修改${cnname}
+	 */
+	public String update(){
+		${name} adm = mgr.get(getId());
+		${name.Low}.setId(getId());
+		//${name.Low}.setCreateDate(${name.Low}.getCreateDate());
+		mgr.update(${name.Low});
+		return ajaxForwardSuccess("修改成功!");
+	}
+	
+	/*
+	 * 批量删除
+	 */
+	public String batch(){
+		 mgr.batchDelete(ids);	
+		return ajaxForwardSuccess("操作成功!");
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public List<${name}> get${name}Lst() {
+		return ${name.Low}Lst;
+	}
+	
+	
+
+
+	public void set${name}Lst(List<${name}> ${name.Low}Lst) {
+		this.${name.Low}Lst = ${name.Low}Lst;
+	}
+
+	public ${name} get${name}() {
+		return ${name.Low};
+	}
+
+	public void set${name}(${name} ${name.Low}) {
+		this.${name.Low} = ${name.Low};
+	}
+	
+	public String getIds() {
+		return ids;
+	}
+
+	public void setIds(String ids) {
+		this.ids = ids;
+	}
+	
+	
+	
+	
+	
+	
+
+}

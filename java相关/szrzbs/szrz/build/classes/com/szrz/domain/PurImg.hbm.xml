@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="GBK"?>
+<!-- 指定Hibernate映射文件的DTD信息 -->
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Hibernate映射文件的根元素 -->
+<hibernate-mapping package="com.szrz.domain">
+	<class	name="PurImg"	table="PurImg_table">
+		<!-- 使用只读缓存 -->
+		
+		<!-- 映射标识属性 -->
+		<id	name="id" type="integer" column="id">
+			<!-- 指定使用identity主键生成策略 -->
+			<generator class="identity"/>
+		</id>
+		
+		<!-- 映射普通属性 -->
+		<property name="imgName" column="imgName" type="string" length="50"/>
+		<property name="oglPath" column="oglPath" type="string" length="50"/>
+		<property name="path" column="path" type="string" length="50"/>
+		<property name="typeId" column="typeId" type="string" length="50"/>
+		<property name="typeName" column="typeName" type="string" length="50"/>
+		<property name="purUserId" column="purUserId" type="string" length="50"/>
+		<property name="purUserName" column="purUserName" type="string" length="50"/>
+		<property name="purUserIdCard" column="purUserIdCard" type="string" length="50"/>
+		<property name="purTime" column="purTime" type="string" length="50"/>
+		<property name="imgId" column="imgId" type="string" length="50"/>
+		<property name="valueCoin" column="valueCoin" type="integer" length="50"/>
+		<property name="antiTime" column="antiTime" type="string" length="50"/>
+		<property name="startDate" column="startDate" type="string" length="50"/>
+		<property name="endDate" column="endDate" type="string" length="50"/>
+		<property name="validDate" column="validDate" type="string" length="50"/>
+		<property name="shootPlace" column="shootPlace" type="string" length="50"/>
+		<property name="shootTime" column="shootTime" type="string" length="50"/>
+		<property name="userId" column="userId" type="string" length="50"/>
+		<property name="userName" column="userName" type="string" length="50"/>
+		<property name="userIdCard" column="userIdCard" type="string" length="50"/>
+		<property name="status" column="status" type="string" length="50"/>
+
+	</class>
+</hibernate-mapping>

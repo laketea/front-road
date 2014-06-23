@@ -1,0 +1,15 @@
+${package}
+
+${import}
+
+${Description}
+public class ${name}
+	implements Serializable
+{
+	${properties}
+	public ${name}(){
+		
+	}
+	${proMethod}
+	
+}

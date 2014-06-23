@@ -1,0 +1,18 @@
+数字认证系统部署文档
+
+一。数据库：mysql5.0 数据库编码gbk或gb2312。
+	数据库已导出为sql文件，可适用sql source命令导入现有的数据
+	另外程序中数据库连接字符串信息为：数据库名称 szrz，用户 root，密码123456.
+	如需更改，webcontent/web-info/applicationContext.xml,17行处，修改对应的参数
+
+二。开发工具。eclipse，尽量适用j2ee版的，或者安装web相关开发插件，工程文件编码为gbk，直接导入工程即可。
+
+三。应用服务器，tomcat7，tomcat中请设置URIEncoding="gbk"
+
+四。前台默认用户name:zhangwei,pwd:123123
+
+五。后台登录地址：/admin,默认登录用户：name:zhangwei,pwd:123456.
+
+六。系统主要使用了SSH ，dwz，jquery等框架。
+
+七。因为时间比较紧，所以很多细节以及一些边界都没有处理，，但是应付检查差不多了。具体我后期再完善吧。

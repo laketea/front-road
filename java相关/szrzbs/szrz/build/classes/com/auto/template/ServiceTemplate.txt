@@ -1,0 +1,30 @@
+/**
+ * 
+ */ 
+package com.szrz.service; 
+
+import java.util.List;
+
+import com.szrz.common.hibernate.Page;
+import com.szrz.domain.${name};
+
+
+public interface ${name}Manager {
+	
+	public void add(${name} ${name.Low});
+	
+	public void update(${name} ${name.Low});
+	
+	public void delete(Integer id);
+	
+	public List<${name}> findAll();
+	
+	public ${name} get(Integer id);
+	
+	public Page findByPage(${name} ${name.Low},int pageNo ,int PageSize);
+	
+	public void batchDelete(String ids);
+	
+	
+
+}

@@ -1,0 +1,55 @@
+package com.zo2zo.dao.impl;
+
+import java.util.*; 
+
+import com.zo2zo.domain.*;
+import com.zo2zo.common.hibernate.*;
+import com.zo2zo.dao.*;
+
+
+/*
+ *${cnname}dao µœ÷¿‡
+ */ 
+public class ${name}DaoHibernate
+	extends ZoHibernateDaoSupport
+	implements ${name}Dao
+{
+
+	public ${name} get(Integer id)
+	{
+		return getHibernateTemplate()
+			.get(${name}.class , id);
+	}
+
+	public Integer save(${name} ${name.Low})
+	{
+		return (Integer)getHibernateTemplate()
+			.save(${name.Low});
+	}
+
+	public void update(${name} ${name.Low})
+	{
+		getHibernateTemplate()
+			.update(${name.Low});
+	}
+
+	public void delete(${name} ${name.Low})
+	{
+		getHibernateTemplate()
+			.delete(${name.Low});
+	}
+
+	public void delete(Integer id)
+	{
+		getHibernateTemplate()
+			.delete(get(id));
+	}
+
+	public List<${name}> findAll()
+	{
+		return (List<${name}>)getHibernateTemplate()
+			.find("from ${name}");
+	}
+
+	
+}

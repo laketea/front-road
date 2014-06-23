@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+                            "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+                            "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+
+<!-- DO NOT EDIT: This is a generated file that is synchronized -->
+<!-- by MyEclipse Hibernate tool integration.                   -->
+<!-- Created Sun Jan 29 11:50:19 GMT-08:00 2006                         -->
+<hibernate-mapping package="com.bookstore.po">
+
+    <class name="Orders" table="orders">
+        <id name="id" column="id" type="long">
+            <generator class="increment"/>
+        </id>
+        <property name="userid" column="userid" type="long"  not-null="true" />
+		<property name="username" column="username" type="string"  not-null="true" />
+		<property name="addid" column="addid" type="long"  not-null="true" />
+		<property name="point" column="point" type="long"  not-null="false" />
+        <property name="payflag" column="payflag" type="string"  not-null="false" />
+		<property name="sendflag" column="sendflag" type="string"  not-null="false" />
+        <property name="orderdate" column="orderdate" type="date" not-null="false"  />
+        <property name="sendway" column="sendway" type="string"  not-null="true" />
+        <property name="payway" column="payway" type="string"  not-null="true" />
+        <property name="totalprice" column="totalprice" type="double" not-null="true"  />
+        <property name="newprice" column="newprice" type="double" not-null="true"  />
+        <property name="mailprice" column="mailprice" type="double" not-null="true"  />
+        <property name="userpoint" column="userpoint" type="long" not-null="true"  />
+        <property name="received" column="received" type="string" not-null="true"  />
+        <property name="mailaddress" column="mailaddress" type="string" not-null="false"  />
+        <property name="mailcompany" column="mailcompany" type="string" not-null="false"  />
+        <property name="mailid" column="mailid" type="string" not-null="false"  />
+        <property name="zfbuser" column="zfbuser" type="string" not-null="false"  />
+        <property name="zfbprice" column="zfbprice" type="double" not-null="false"  />
+        <property name="zfbstatus" column="zfbstatus" type="string" not-null="false"  />
+        <property name="zfbid" column="zfbid" type="string" not-null="false"  />
+        <property name="zfbdate" column="zfbdate" type="string" not-null="false"  />
+    </class>
+    
+</hibernate-mapping>

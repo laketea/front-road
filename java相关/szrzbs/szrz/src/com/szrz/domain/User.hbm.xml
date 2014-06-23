@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="GBK"?>
+<!-- 指定Hibernate映射文件的DTD信息 -->
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Hibernate映射文件的根元素 -->
+<hibernate-mapping package="com.szrz.domain">
+	<class	name="User"	table="User_table">
+		<!-- 使用只读缓存 -->
+		
+		<!-- 映射标识属性 -->
+		<id	name="id" type="integer" column="id">
+			<!-- 指定使用identity主键生成策略 -->
+			<generator class="identity"/>
+		</id>
+		
+		<!-- 映射普通属性 -->
+		<property name="nick" column="nick" type="string" length="50"/>
+		<property name="name" column="name" type="string" length="50"/>
+		<property name="idCard" column="idCard" type="string" length="50"/>
+		<property name="passward" column="passward" type="string" length="50"/>
+		<property name="email" column="email" type="string" length="50"/>
+		<property name="age" column="age" type="string" length="50"/>
+		<property name="male" column="male" type="string" length="50"/>
+		<property name="userWork" column="userWork" type="string" length="50"/>
+		<property name="goldCoin" column="goldCoin" type="integer" length="50"/>
+		<property name="status" column="status" type="string" length="50"/>
+		<property name="regTime" column="regTime" type="string" length="50"/>
+		<property name="loginCount" column="loginCount" type="integer" length="50"/>
+
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+                            "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+                            "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+
+<!-- DO NOT EDIT: This is a generated file that is synchronized -->
+<!-- by MyEclipse Hibernate tool integration.                   -->
+<!-- Created Sun Jan 29 11:50:19 GMT-08:00 2006                         -->
+<hibernate-mapping package="com.bookstore.po">
+
+    <class name="User" table="user">
+        <id name="id" column="id" type="long">
+            <generator class="increment"/>
+        </id>
+ 
+        <property name="username" column="username" type="string"  not-null="true" />
+		<property name="password" column="password" type="string"  not-null="true" />
+		<property name="email" column="email" type="string"  not-null="true" />
+		<property name="lastlogin" column="lastlogin" type="date"   />
+		<property name="status" column="status" type="long"   />
+        <property name="code" column="code" type="string"  />
+        <property name="point" column="point" type="long"   />
+    </class>
+    
+</hibernate-mapping>

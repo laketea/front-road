@@ -1,0 +1,41 @@
+openfire初始化过程
+
+XMPPServer.start()
+	version==new VerSIon(3.4.3)
+	loader--
+	CacheFactory，initialize();
+	
+	XMPPServerInfoImpl->初始化.主要包含server的基本信息，name，version，date，connectManage等
+	
+	初始化pluginManager-->插件管理器，传入地址 openfireHome, "plugins"
+	
+	验证数据库链接管理verifyDataSource();，DbConnectionManager 发送一条简单的查询sql，成功则成功，否则失败
+	
+	loadModules();加载模块//反射方法加载，并且放入modules中
+			Class modClass = loader.loadClass(module);
+            Module mod = (Module) modClass.newInstance();
+            this.modules.put(modClass, mod);
+	
+    initModules();初始化模块
+    		遍历modules,module.initialize(this);，
+    		如果失败则remove
+    
+    startModules();启动模块
+    		遍历modules,module.start();，
+    		如果失败则remove
+    
+    ServerTrafficCounter.initStatistics();//流量统计
+    
+    pluginManager.start();插件管理对象启动
+    
+    记录服务启动
+    
+    监听启动
+    for (XMPPServerListener listener : listeners) {
+                listener.serverStarted();
+            }
+            
+            
+            
+new ServerStarter().start()---加载jar 解压缩jar            
+	openfire-类结构分析.jpg

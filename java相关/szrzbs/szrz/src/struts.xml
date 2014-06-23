@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="GBK"?>
+<!-- 指定Struts2配置文件的DTD信息 -->
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+	"http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<!-- Struts2配置文件的根元素 -->
+<struts>
+	<!-- 是否显示详细错误信息 -->
+	<constant name="struts.devMode" value="true" />
+	<!-- 国际化资源文件名称 -->
+
+
+	<!-- 配置使用Spring管理Action -->
+	<constant name="struts.objectFactory" value="spring" />
+	
+	<constant name="struts.multipart.saveDir" value="/oldPath"></constant>
+	<!-- 编码 -->
+
+	<!-- 后缀 -->
+	<constant name="struts.action.extension" value="action" />
+	<!-- 结果资源的路径 -->
+	<constant name="struts.convention.result.path" value="/WebContent/" />
+	<!-- spring 缓存机制 -->
+	<constant name="struts.objectFactory.spring.useClassCache"
+		value="false" />
+
+
+	<package name="basePackage" extends="struts-default">
+		<interceptors>
+			<interceptor-stack name="baseStack">
+				<interceptor-ref name="exception" />
+				<interceptor-ref name="alias" />
+				<interceptor-ref name="servletConfig" />
+				<interceptor-ref name="i18n" />
+				<interceptor-ref name="prepare" />
+				<interceptor-ref name="chain" />
+				<interceptor-ref name="debugging" />
+				<interceptor-ref name="scopedModelDriven" />
+				<interceptor-ref name="modelDriven" />
+				<interceptor-ref name="fileUpload" />
+				<interceptor-ref name="checkbox" />
+				<interceptor-ref name="multiselect" />
+				<interceptor-ref name="staticParams" />
+				<interceptor-ref name="actionMappingParams" />
+				<interceptor-ref name="params">
+					<param name="excludeParams">dojo\..*,^struts\..*</param>
+				</interceptor-ref>
+				<interceptor-ref name="conversionError" />
+				<!-- 配置方法级别的校验 -->
+				<interceptor-ref name="validation">
+					<param name="excludeMethods">input,back,cancel,browse</param>
+					<param name="validateAnnotatedMethodOnly">true</param>
+				</interceptor-ref>
+				<interceptor-ref name="workflow">
+					<param name="excludeMethods">input,back,cancel,browse</param>
+				</interceptor-ref>
+			</interceptor-stack>
+
+			<interceptor name="adminAuth"
+				class="com.szrz.action.authority.AdminAuthorityInterceptor" />
+			<!-- 配置普通员工的默认的拦截器栈 -->
+			<interceptor-stack name="defaultStack">
+				<interceptor-ref name="baseStack" />
+				<interceptor-ref name="adminAuth">
+					<param name="excludeMethods">login,ajaxLogin,add,list,execute,adminLogin,step2,loginOut,reg,upload</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+
+		<!-- 配置默认拦截器栈 -->
+		<default-interceptor-ref name="defaultStack" />
+
+		<!-- 未到找Action指向页面 -->
+		<default-action-ref name="errorPage" />
+
+		<global-results>
+			<result name="ajaxDone">/admin/common/ajaxDone.jsp</result>
+			<result name="ajaxTimeOut">/admin/common/ajaxTimeout.html</result>
+		</global-results>
+
+		<action name="errorPage">
+			<result type="redirect">/admin/common/error_page_404.html</result>
+		</action>
+
+
+	</package>
+
+
+	<package name="views" extends="basePackage" namespace="/">
+		<action name="index" class="com.szrz.views.IndexAction">
+			<result name="index">/views.jsp</result>
+		</action>
+
+		<action name="news" class="com.szrz.views.NewsAction">
+			<result name="news">/news.jsp</result>
+		</action>
+		<action name="newsType" class="com.szrz.views.NewsTypeAction">
+			<result name="newstype">/newstype.jsp</result>
+		</action>
+		<action name="newsShow" class="com.szrz.views.NewsShowAction">
+			<result name="newsshow">/newsshow.jsp</result>
+		</action>
+		<action name="guestBook" class="com.szrz.views.GuestAction">
+			<result name="guestbook">/guestbook.jsp</result>
+		</action>
+		<action name="user" class="com.szrz.views.UserAction">
+			<result name="input">/reg.jsp</result>
+			<result name="index" type="chain">index</result>
+		</action>
+
+		<action name="copyright" class="com.szrz.views.CopyRightAction">
+
+			<interceptor-ref name="fileUpload">
+				<param name="allowedTypes">
+					image/bmp,image/png,image/gif,image/jpeg,image/jpg,image/pjpeg,application/msword,application/vnd.ms-excel,application/x-shockwave-flash,flv-application/octet-stream,video/x-flv
+				</param>
+				<param name="maximumSize">10240000</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="copyright">/copyright.jsp</result>
+			<result name="copyright-step-2">/copyright-step-2.jsp</result>
+			<result name="index" type="chain">index</result>
+		</action>
+		
+		<action name="antiImg" class="com.szrz.views.AntiImgAction">
+
+			<interceptor-ref name="fileUpload">
+				<param name="allowedTypes">
+					image/bmp,image/png,image/gif,image/jpeg,image/jpg,image/pjpeg,application/msword,application/vnd.ms-excel,application/x-shockwave-flash,flv-application/octet-stream,video/x-flv
+				</param>
+				<param name="maximumSize">10240000</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<result name="anti">/anti.jsp</result>
+			<result name="anti-step-2">/anti-step-2.jsp</result>
+			<result name="index" type="chain">index</result>
+		</action>
+
+
+	</package>
+
+	<package name="admin" extends="basePackage" namespace="/admin">
+
+	
+
+
+
+		<action name="adminList" class="com.szrz.action.AdminAction"
+			method="list">
+			<result name="list">/admin/admin/admin_list.jsp</result>
+		</action>
+		<action name="admin" class="com.szrz.action.AdminAction">
+			<result name="list">/admin/admin/admin_list.jsp</result>
+			<result name="edit">/admin/admin/edit.jsp</result>
+			<result name="logininput">/admin/index.jsp</result>
+			<result name="adminindex">/admin/admin.jsp</result>
+		</action>
+
+		<action name="userInfo" class="com.szrz.action.UserInfoAction">
+			<result name="list">/admin/userinfo/list.jsp</result>
+			<result name="edit">/admin/userinfo/edit.jsp</result>
+			<result name="ajaxDone">/admin/common/ajaxDone.jsp</result>
+		</action>
+
+		<action name="user" class="com.szrz.action.UserAction">
+			<result name="list">/admin/user/list.jsp</result>
+			<result name="edit">/admin/user/edit.jsp</result>
+		</action>
+
+		<action name="loginInfo" class="com.szrz.action.LoginInfoAction">
+			<result name="list">/admin/logininfo/list.jsp</result>
+			<result name="edit">/admin/logininfo/edit.jsp</result>
+			<result name="ajaxDone">/admin/common/ajaxDone.jsp</result>
+		</action>
+
+		<action name="copyRightImg" class="com.szrz.action.CopyRightImgAction">
+			<result name="list">/admin/copyrightimg/list.jsp</result>
+			<result name="edit">/admin/copyrightimg/edit.jsp</result>
+		</action>
+
+		<action name="antiImg" class="com.szrz.action.AntiImgAction">
+			<result name="list">/admin/antiimg/list.jsp</result>
+			<result name="edit">/admin/antiimg/edit.jsp</result>
+		</action>
+
+		<action name="imgType" class="com.szrz.action.ImgTypeAction">
+			<result name="list">/admin/imgtype/list.jsp</result>
+			<result name="edit">/admin/imgtype/edit.jsp</result>
+		</action>
+
+		<action name="purImg" class="com.szrz.action.PurImgAction">
+			<result name="list">/admin/purimg/list.jsp</result>
+			<result name="edit">/admin/purimg/edit.jsp</result>
+		</action>
+		<action name="newsType" class="com.szrz.action.NewsTypeAction">
+			<result name="list">/admin/newstype/list.jsp</result>
+			<result name="edit">/admin/newstype/edit.jsp</result>
+		</action>
+		<action name="news" class="com.szrz.action.NewsAction">
+			<result name="list">/admin/news/list.jsp</result>
+			<result name="edit">/admin/news/edit.jsp</result>
+			<result name="add">/admin/news/add.jsp</result>
+		</action>
+		<action name="guestBookType" class="com.szrz.action.GuestBookTypeAction">
+			<result name="list">/admin/guestbooktype/list.jsp</result>
+			<result name="edit">/admin/guestbooktype/edit.jsp</result>
+		</action>
+		<action name="guestBook" class="com.szrz.action.GuestBookAction">
+			<result name="list">/admin/guestbook/list.jsp</result>
+			<result name="edit">/admin/guestbook/edit.jsp</result>
+			<result name="add">/admin/guestbook/add.jsp</result>
+		</action>
+
+
+
+	</package>
+</struts>

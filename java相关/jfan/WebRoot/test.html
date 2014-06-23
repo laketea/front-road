@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+</head>
+
+<body>
+
+<script language="javascript" type="text/javascript">
+window.onload=function(){
+    var o=document.getElementById('box');
+    window.setInterval(function(){scrollup(o,24,0);},3000); 
+}
+///滚动主方法
+///参数:o 滚动块对象
+///参数:d 每次滚屏高度
+///参数:c 当前已滚动高度
+function scrollup(o,d,c){
+    if(d==c){
+        var t=getFirstChild(o.firstChild).cloneNode(true);
+        o.removeChild(getFirstChild(o.firstChild));
+        o.appendChild(t);
+        t.style.marginTop="0px";
+    }else{
+        c+=2;
+        getFirstChild(o.firstChild).style.marginTop=-c+"px";
+        window.setTimeout(function(){scrollup(o,d,c)},20);
+    }
+}
+//解决firefox下会将空格回车作为节点的问题
+function getFirstChild(node){
+  while (node.nodeType!=1)
+  {
+         node=node.nextSibling;
+  }
+  return node;
+}
+</script>
+<ul id="box">
+    <li>· 新华每日电讯:音乐版权收费像“一团麻” </li>
+    <li>· 现代快报：人类能否和机器人结婚生孩子? </li>
+    <li>· 环球:美国,一家亿万富翁俱乐部的破产 </li>
+    <li>· 现代快报:为让媒体封口倪震欲卖李嘉欣情书 </li>
+    <li>· 京华时报:北京航空航天大学学生自制火箭升天 </li>    
+</ul> 
+
+本文来自：ASP急救中心（http://www.ccap168.cn），详细出处参考:http://www.ccap168.cn/news/20091018121816.htm
+</body>
+</html>

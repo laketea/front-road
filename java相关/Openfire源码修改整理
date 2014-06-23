@@ -1,0 +1,110 @@
+Openfire源码修改整理
+       
+一。启动处理
+	默认方式：org.jivesoftware.openfire.starter.ServerStarter 通过反射调用
+	org.jivesoftware.openfire.XMPPServer,启动。
+	目前方式:youngfriend.server.system.messgelib.ServerListener启动，使用mima绑定
+	ServerHandler到5225端口的消息处理，如果消息为startup则启动（xmppserver），shutdown则关闭，这样的方式方便
+	服务管理器对openfire的启动以及关闭处理。
+二。模块分析
+	1.PacketRouterImpl(org.jivesoftware.openfire.spi),主要功能，分发 iq,message ,presence,具体的分发分别调用相关的模块。
+		 public void route(Packet packet) {
+        if (packet instanceof Message) {
+            route((Message)packet);
+        }
+        else if (packet instanceof Presence) {
+            route((Presence)packet);
+        }
+        else if (packet instanceof IQ) {
+            route((IQ)packet);
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
+    }
+    
+    2.RoutingTableImpl （org.jivesoftware.openfire.spi）保存所有链接到服务器的client sessions，并且根据情况进行更新。
+    3.AuditManagerImpl （org.jivesoftware.openfire.audit.spi;）审计模块，添加一个拦截器到系统拦截器，使其可以对packet session对其审计，也就是
+    	记录日志,并且通过 xmpp.audit.active 配置来配置模块是否使用，等于日志系统，并且高可配置。
+    4.RosterManager(org.jivesoftware.openfire.roster)也就是好友管理。xmpp.client.roster.active 通过此配置来设置模块是否使用。
+     也包裹分组的管理，初始化的时候 注册到RosterEventDispatcher的监听，主要用与内部。start时，注册到UserEventDispatcher，GroupEventDispatcher的监听
+     Roster是用户名单的类，保存到用户名，以及对应的好友以及分组信息等。
+    5.PrivateStorage（org.jivesoftware.openfire） 用户账户私人存储，用来保存客户设置。
+    6.PresenceManagerImpl（org.jivesoftware.openfire.spi） 用户状态维护，在线离线等。
+    7.SessionManager(org.jivesoftware.openfire) 管理会话跟用户账户的关联。主要跟routingTable打交道，可以说真正管理，session的一块。
+    	比较重要的方法为:
+    	createClientSession：创建客户端session的初始方法（LocalClientSession），初始化后，
+    	
+    	加入到需要权限认证的 cache中。count++
+    	
+    	
+    	AddSession，认证成功后 移除需要权限验证的seesion，并且 加入到routingTable的clineRount中。
+    	
+    	removeSession;从这个方法可以看到，用户推出链接的整个处理过程。
+    	首先移除routingTable中的session，如何移除权限认证的session。，根据处理情况，router分发离线消息。
+    	sessioncache移除session，counter--;
+    	内部包含一系列的sessionListener
+    	在着一层，session的基本单位是localClentSession
+    	有必要说下这个类，extends LocalSession implements ClientSession，LoclSession是一个抽象类，一些基本的处理包含了
+    	相关的包为:org.jivesoftware.openfire.session
+    	
+    8.IQRouter 这一块相对比较简单，主要是处理 iq消息。核心方法如下:
+    	route(IQ packet):通过from查询 sessionManager.getSession(sender);
+    	处理之前先进行拦截器的处理.
+    	如果链接的不是本server，那么创建一个iq，返回给session处理。session.process(reply);
+    	如果符号判断，则进入 handle(packet)环节。
+    	其他的 ，则返回没有权限认证的处理，同样也打包给sesison处理。
+    	最后在packet结束后再进行一个拦截器的处理.
+    	
+    	handle(IQ packet)：真正核心的iq处理.
+    		如果属于多路，则multicastRouter.route(packet);
+    		如果---省略。
+    		如果registered components, services or remote servers，则交给routingTable纷繁
+    			routingTable.routePacket(recipientJID, packet, false);
+    		如果是server是本机:,则首先通过userManager 判断是否注册用户，其他通过
+    			PrivacyListManager.getInstance().getDefaultPrivacyList(recipientJID.getNode())
+    			来验证，权限处理。
+    		
+    		这里有个重要的验证，验证是否本地服务器，可能后面需要改到，另外还有个handler类。
+    9.MessageRouter 主要是消息的分发。
+    	route(Message packet)
+    	routingTable.routePacket(recipientJID, packet, false);
+    	routeToBareJID
+    	for (JID address : getRoutes(recipientJID)) {
+            ClientSession session = getClientRoute(address);
+            if (session != null) {
+                sessions.add(session);
+            }
+        }
+        找到session，然后session process(packet),
+        session process中，通过conn.deliver(packet);最后分发这个消息
+    10.PresenceRouter 出席消息路由
+    11.MulticastRouter多个接收者的消息路由
+    12.PacketTransporterImpl(org.jivesoftware.openfire.spi) 消息传输模块
+    13.OfflineMessageStrategy（org.jivesoftware.openfire）离线消息处理的类型
+    	首先提供一个枚举类型 enum Type，用来分别代表各种处理方式。
+    	具体处理方式，可通过xmpp.offline.type 进行配置，分为 返回，存储以及放弃等方式。
+    	并且在具体存储或其他离线消息时，for (OfflineMessageListener listener : listeners) {
+                listener.messageStored(message);
+            }，处理各个监听类的时间。
+    14.OfflineMessageStore 离线消息存储.
+    	定义了所有用到的静态sql语句，主要提供添加message，删除，用户以及对应时间的离线消息等。
+    15.PacketDelivererImpl（org.jivesoftware.openfire.spi） 消息包发送传递模块,
+    	真正分发的类是 SocketPacketWriteHandler（org.jivesoftware.openfire.net），
+    	这个类的内部呢，也是routingTable.routePacket(recipient, packet, false)，只是考虑多种情况。
+    16.VCardManager(org.jivesoftware.openfire.vcard)用户名片管理
+      主要包含以下几个类:VCardProvider(provider.vcard.className,通过这个反射来加载),VCardListener,VCardEventDipatcher.
+      加入了缓冲机制，而实际操作VCard的 类是 provider
+      
+    17.IQRosterHandler(org.jivesoftware.openfire.handler) 好友列表 handler
+    	handleIQ-> 进入主要的处理方法manageRoster
+    	这里设计到几个重要的类，
+    	User Roster
+    	4
+    18.PresenceUpdateHandler(org.jivesoftware.openfire.handler)在线状态更改
+    
+    19.IQAuthHandler（org.jivesoftware.openfire.handler）用户认证协议，具体如何认证呢可以通过插件来实现扩展。
+    	AuthFactory-org.jivesoftware.openfire.auth
+    			
+    	
+    	

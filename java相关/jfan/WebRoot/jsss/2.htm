@@ -1,0 +1,961 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0071)http://www.epanel.com.cn/epanelweb/regist/putong/page905.do?method=show -->
+<HTML><HEAD><TITLE>免费注册：ePanel市场咨询有限公司-注册获得积分-参与在线商业调查-兑换现金礼品</TITLE>
+<META 
+content=免费注册,注册有奖,在线赚钱,网上赚钱,网上调查,商业调查,有奖调查,在线调查,网络调查,付费调查,市场调查,兑换现金,发布调查,调查平台,支付宝,当当网,精美礼品 
+name=keywords>
+<META content=注册即获得积分,参加商业调查获得高额的积分报酬,累积积分,支付宝兑换现金,当当网购物券,及更多精美礼品. 
+name=description>
+<META http-equiv=Content-Type content="text/html; charset=utf-8"><!--对联广告用到的javascript//
+<script src="/epanelweb/js/youbiao.js" language="javascript"></script>--><!--对联广告用到的javascript结束//-->
+<SCRIPT language=javascript 
+src="files/util.js"></SCRIPT>
+
+<SCRIPT language=javascript 
+src="files/dateutil.js"></SCRIPT>
+
+<SCRIPT language=javascript 
+src="files/city.js"></SCRIPT>
+
+<SCRIPT type=text/javascript>
+
+	
+	window.onload = function(){
+		//initTop() ;
+		theForm = document.regist_putong_page905Form ;
+		theForm.bt_regist.onclick = bt_regist_click ;
+		
+		theForm.birthdayYear.onchange=changeNowDate;
+		theForm.birthdayMonth.onchange=changeNowDate;
+		
+		theForm.agree[0].onclick=agree0_click;
+		theForm.agree[1].onclick=agree1_click;
+		
+		theForm.agree[0].checked = true;
+		theForm.bt_regist.disabled = true;
+		theForm.bt_regist.value = '请接受协议';
+		
+		initYear() ;
+		review() ;
+		
+	}
+	
+	function agree0_click(){
+		theForm.bt_regist.disabled = true;
+		theForm.bt_regist.value = '请接受协议';
+	}
+	function agree1_click(){
+		theForm.bt_regist.disabled=false;
+		theForm.bt_regist.value = '提　交';
+	}
+	
+	function review(){
+		
+		reviewSelect(theForm.birthdayYear,'null') ;
+		changeNowDate();
+		reviewSelect(theForm.birthdayMonth,null) ;
+		changeNowDate();
+		reviewSelect(theForm.birthdayDay,null) ;
+		
+		
+		
+		theForm.email.value='';
+		theForm.password.value='';
+		theForm.repass.value='';
+		
+		reviewRadio(theForm.sex,'null');
+		
+		
+		//现居住地
+		if(theForm.address1 != null){
+			reviewSelect(theForm.address1,'null') ;
+		}
+		if(theForm.address2 != null){
+			address1change('','',theForm) ;
+			reviewSelect(theForm.address2,'null') ;
+		}
+		if(theForm.address3 != null){
+			address2change('',theForm) ;
+			reviewSelect(theForm.address3,'null') ;
+		}
+		
+	}
+	//初始化年
+	function initYear(){
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1903";
+		  	opt1.value = "1903";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1904";
+		  	opt1.value = "1904";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1905";
+		  	opt1.value = "1905";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1906";
+		  	opt1.value = "1906";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1907";
+		  	opt1.value = "1907";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1908";
+		  	opt1.value = "1908";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1909";
+		  	opt1.value = "1909";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1910";
+		  	opt1.value = "1910";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1911";
+		  	opt1.value = "1911";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1912";
+		  	opt1.value = "1912";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1913";
+		  	opt1.value = "1913";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1914";
+		  	opt1.value = "1914";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1915";
+		  	opt1.value = "1915";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1916";
+		  	opt1.value = "1916";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1917";
+		  	opt1.value = "1917";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1918";
+		  	opt1.value = "1918";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1919";
+		  	opt1.value = "1919";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1920";
+		  	opt1.value = "1920";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1921";
+		  	opt1.value = "1921";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1922";
+		  	opt1.value = "1922";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1923";
+		  	opt1.value = "1923";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1924";
+		  	opt1.value = "1924";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1925";
+		  	opt1.value = "1925";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1926";
+		  	opt1.value = "1926";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1927";
+		  	opt1.value = "1927";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1928";
+		  	opt1.value = "1928";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1929";
+		  	opt1.value = "1929";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1930";
+		  	opt1.value = "1930";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1931";
+		  	opt1.value = "1931";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1932";
+		  	opt1.value = "1932";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1933";
+		  	opt1.value = "1933";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1934";
+		  	opt1.value = "1934";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1935";
+		  	opt1.value = "1935";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1936";
+		  	opt1.value = "1936";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1937";
+		  	opt1.value = "1937";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1938";
+		  	opt1.value = "1938";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1939";
+		  	opt1.value = "1939";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1940";
+		  	opt1.value = "1940";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1941";
+		  	opt1.value = "1941";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1942";
+		  	opt1.value = "1942";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1943";
+		  	opt1.value = "1943";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1944";
+		  	opt1.value = "1944";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1945";
+		  	opt1.value = "1945";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1946";
+		  	opt1.value = "1946";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1947";
+		  	opt1.value = "1947";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1948";
+		  	opt1.value = "1948";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1949";
+		  	opt1.value = "1949";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1950";
+		  	opt1.value = "1950";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1951";
+		  	opt1.value = "1951";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1952";
+		  	opt1.value = "1952";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1953";
+		  	opt1.value = "1953";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1954";
+		  	opt1.value = "1954";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1955";
+		  	opt1.value = "1955";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1956";
+		  	opt1.value = "1956";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1957";
+		  	opt1.value = "1957";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1958";
+		  	opt1.value = "1958";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1959";
+		  	opt1.value = "1959";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1960";
+		  	opt1.value = "1960";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1961";
+		  	opt1.value = "1961";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1962";
+		  	opt1.value = "1962";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1963";
+		  	opt1.value = "1963";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1964";
+		  	opt1.value = "1964";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1965";
+		  	opt1.value = "1965";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1966";
+		  	opt1.value = "1966";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1967";
+		  	opt1.value = "1967";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1968";
+		  	opt1.value = "1968";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1969";
+		  	opt1.value = "1969";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1970";
+		  	opt1.value = "1970";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1971";
+		  	opt1.value = "1971";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1972";
+		  	opt1.value = "1972";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1973";
+		  	opt1.value = "1973";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1974";
+		  	opt1.value = "1974";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1975";
+		  	opt1.value = "1975";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1976";
+		  	opt1.value = "1976";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1977";
+		  	opt1.value = "1977";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1978";
+		  	opt1.value = "1978";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1979";
+		  	opt1.value = "1979";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1980";
+		  	opt1.value = "1980";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1981";
+		  	opt1.value = "1981";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1982";
+		  	opt1.value = "1982";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1983";
+		  	opt1.value = "1983";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1984";
+		  	opt1.value = "1984";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1985";
+		  	opt1.value = "1985";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1986";
+		  	opt1.value = "1986";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1987";
+		  	opt1.value = "1987";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1988";
+		  	opt1.value = "1988";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1989";
+		  	opt1.value = "1989";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1990";
+		  	opt1.value = "1990";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1991";
+		  	opt1.value = "1991";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1992";
+		  	opt1.value = "1992";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1993";
+		  	opt1.value = "1993";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1994";
+		  	opt1.value = "1994";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1995";
+		  	opt1.value = "1995";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1996";
+		  	opt1.value = "1996";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1997";
+		  	opt1.value = "1997";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1998";
+		  	opt1.value = "1998";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "1999";
+		  	opt1.value = "1999";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2000";
+		  	opt1.value = "2000";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2001";
+		  	opt1.value = "2001";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2002";
+		  	opt1.value = "2002";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2003";
+		  	opt1.value = "2003";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2004";
+		  	opt1.value = "2004";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2005";
+		  	opt1.value = "2005";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2006";
+		  	opt1.value = "2006";
+	      	theForm.birthdayYear.add(opt1);
+
+          	opt1 = document.createElement("option")
+	      	opt1.text = "2007";
+		  	opt1.value = "2007";
+	      	theForm.birthdayYear.add(opt1);
+
+		theForm.birthdayYear.selectIndex = 0 ;
+		changeNowDate() ;
+		//changeToDate() ;
+	}	
+	function changeNowDate(){
+		var year= theForm.birthdayYear ;
+		var month = theForm.birthdayMonth ;
+		var date = theForm.birthdayDay ;
+		changeDate(year, month, date) ;
+	}
+	
+	function checkmail(mail){
+	  var strr;
+	  re=/(\w+@\w+\.\w+)(\.{0,1}\w*)(\.{0,1}\w*)/i;
+	  re.exec(mail);
+	  if (RegExp.$3!=""&&RegExp.$3!="."&&RegExp.$2!="."){
+	   strr=RegExp.$1+RegExp.$2+RegExp.$3;
+	  }
+	  else
+	    if (RegExp.$2!=""&&RegExp.$2!=".") {
+	    	strr=RegExp.$1+RegExp.$2;
+	    } else {
+	    	strr=RegExp.$1;
+	    }	
+	  if (strr!=mail) {
+		  alert("请填写正确的邮件地址");
+		  return false;
+	  }
+	  return true;
+	}
+	
+	function checkForm(){
+		//协议theForm.agree[0].checked = true;
+		if(theForm.agree != null){
+			if(!radioIsChecked(theForm.agree)){
+				alert("请接受协议！") ;
+				theForm.agree[0].focus() ;
+				return false ;
+			}
+			if(theForm.agree[0].checked){
+				alert("请接受协议！") ;
+				theForm.agree[0].focus() ;
+				return false ;
+			}
+		}
+		
+		
+		//@电子邮件
+		if(theForm.email != null){
+			var email = theForm.email.value ;
+			
+			email = email.replace( /^\s*/, "" ).replace( /\s*$/, "" ) ;
+			
+			if(email == ""){
+				alert("请输入电子邮件！") ;
+				theForm.email.focus() ;
+				return false ;
+			}
+			if(!isEmail(email)){
+				alert("电子邮件格式不正确！") ;
+				theForm.email.focus() ;
+				return false ;
+			}
+		}
+		
+		//密码
+		if(theForm.password != null){
+			var password = theForm.password.value ;
+			
+			password = password.replace( /^\s*/, "" ).replace( /\s*$/, "" ) ;
+			
+			if(password == ""){
+				alert("请输入密码！") ;
+				theForm.password.focus() ;
+				return false ;
+			}
+			
+			//检验字符是否为英文和数字
+
+
+
+			for(var i = 0; i < password.length; i ++){
+				var c = password.charAt(i) ;
+				if(!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'z') && !(c >='A' && c <= 'Z')){
+					alert("密码必须为英文或数字！") ;
+					theForm.password.focus() ;
+					return false ;
+				}
+			}
+			
+			//检验长度是否为4~12位
+
+
+
+			if(password.length < 4 || password.length > 12){
+				alert("密码长度必须为4~12位！") ;
+				theForm.password.focus() ;
+				return false ;
+			}
+			
+		}
+		
+		//密码确认
+		if(theForm.repass != null){
+			var repass = theForm.repass.value ;
+			var password = theForm.password.value ;
+			
+			repass = repass.replace( /^\s*/, "" ).replace( /\s*$/, "" ) ;
+			
+			if(repass == ""){
+				alert("请输入密码确认！") ;
+				theForm.repass.focus() ;
+				return false ;
+			}
+			
+			if(repass != password){
+				alert("密码确认错误！") ;
+				theForm.repass.focus() ;
+				return false ;
+			}
+		}
+		
+		//性别
+		if(theForm.sex != null){
+			if(!radioIsChecked(theForm.sex)){
+				alert("请选择性别！") ;
+				theForm.sex[0].focus() ;
+				return false ;
+			}
+		}
+		
+		//出生日期
+		if(theForm.birthdayYear != null){
+			if(theForm.birthdayYear.selectedIndex == 0){
+				alert("请选择出生日期(年)！") ;
+				theForm.birthdayYear.focus() ;
+				return false ;
+			}
+		}
+		//现居住地
+		if(theForm.address1 != null){
+			if(theForm.address1.selectedIndex == 0){
+				alert("请选择现居住地(省份)！") ;
+				theForm.address1.focus() ;
+				return false ;
+			}
+		}
+		
+		if(theForm.address2 != null && !theForm.address2.disabled){
+			if(theForm.address2.selectedIndex == 0){
+				alert("请选择现居住地(城市)！") ;
+				theForm.address2.focus() ;
+				return false ;
+			}
+		}
+		
+		if(theForm.address3 != null && !theForm.address2.disabled){
+			if(theForm.address3.selectedIndex == 0){
+				alert("请选择现居住地(区县)！") ;
+				theForm.address3.focus() ;
+				return false ;
+			}
+		}
+		if(theForm.validate != null){
+			var validate = theForm.validate.value ;
+			
+			validate = validate.replace( /^\s*/, "" ).replace( /\s*$/, "" ) ;
+			
+			if(validate == ""){
+				alert("请输入验证码！") ;
+				theForm.validate.focus() ;
+				return false ;
+			}
+		}
+		
+		return true ;
+	}
+	
+	
+	
+	
+	//TODO:验证用户输入并提交注册请求
+
+
+	function bt_regist_click(){
+	
+		if(!checkForm()){
+			return false;
+		}
+		theForm.bt_regist.disabled=true;
+		theForm.action = '/epanelweb/regist/putong/page905Action.do?method=regist' ;
+		theForm.target = '' ;
+		theForm.submit() ;
+	}
+	
+	function example(){
+//		var action = "/epanelweb/regist/putong/page905Action.do?method=$methodName" ;
+	}
+	
+</SCRIPT>
+<LINK href="files/css.css" 
+type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.6000.16809" name=GENERATOR></HEAD>
+<BODY><!--显示对联广告头//-->
+<DIV id=mm><!--显示对联广告头结束//-->
+<SCRIPT language=javascript 
+src="files/util.js"></SCRIPT>
+
+<SCRIPT 
+src="files/topmenu.js"></SCRIPT>
+
+<SCRIPT language=javascript>
+ top = true ;
+ function initTop(){
+	var theForm = document.login_loginForm ;
+ }
+ 
+ function doNothing(){
+		
+ }
+
+  function password_keyDoown(){
+		if(event.keyCode == 13){
+			bt_login_top_click() ;
+		}
+	}
+
+ function bt_login_top_click(){
+ 	var theForm = document.login_loginForm ;
+	theForm.action = '/epanelweb/login/page107Action.do?method=login' ;
+	theForm.target = '' ;
+	theForm.submit() ;
+ }
+</SCRIPT>
+<SCRIPT language=JavaScript>
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+
+
+
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+
+
+
+  if (restore) selObj.selectedIndex=1;
+
+
+
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_showHideLayers() { //v6.0
+  var i,p,v,obj,args=MM_showHideLayers.arguments;
+  for (i=0; i<(args.length-2); i+=3) if ((obj=MM_findObj(args[i]))!=null) { v=args[i+2];
+    if (obj.style) { obj=obj.style; v=(v=='show')?'visible':(v=='hide')?'hidden':v; }
+    obj.visibility=v; }
+}
+//-->
+  </SCRIPT>
+
+<SCRIPT language=JavaScript>
+
+<!--
+
+<!--
+
+function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+
+  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+
+    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+
+  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
+
+}
+
+MM_reloadPage(true);
+
+// -->
+
+
+
+//-->
+
+  </SCRIPT>
+<TABLE cellSpacing=0 cellPadding=0 width=760 align=center border=0>
+  <TBODY>
+  <TR>
+    <TD height=3></TD></TR></TBODY></TABLE>
+<TABLE 
+onmouseover="MM_showHideLayers('Layer3','','hide','Layer4','','hide','Layer6','','hide','Layer7','','hide','Layer2','','hide')" 
+cellSpacing=0 cellPadding=0 width=760 align=center border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=570 bgColor=#ffffff height=491>
+      <TABLE cellSpacing=0 cellPadding=0 width=570 border=0>
+        <TBODY>
+        <TR>
+          <TD vAlign=top width=570 height=491><FORM name=regist_putong_page905Form action="#" method=post>
+            <TABLE style="BORDER-COLLAPSE: collapse" borderColor=#e8e8e8 
+            cellSpacing=0 cellPadding=2 width="99%" align=center border=1>
+              <TBODY>
+              <TR>
+                <TD width="12%" height=35 bgColor=#c9e4e9>
+                  <DIV align=center>现居住地：</DIV></TD>
+                <TD width="88%" height=35 bgColor=#f3f0f4>&nbsp; <SELECT 
+                  class=form id=address1 
+                  onchange="address1change('','',this.form)" name=address1> 
+                    <OPTION value=0 selected>请选择</OPTION> <OPTION 
+                    value=01>北京</OPTION> <OPTION value=02>天津</OPTION> <OPTION 
+                    value=03>河北省</OPTION> <OPTION value=04>山西省</OPTION> <OPTION 
+                    value=05>内蒙古自治区</OPTION> <OPTION value=06>辽宁省</OPTION> 
+                    <OPTION value=07>吉林省</OPTION> <OPTION value=08>黑龙江省</OPTION> 
+                    <OPTION value=09>上海市</OPTION> <OPTION value=10>江苏省</OPTION> 
+                    <OPTION value=11>浙江省</OPTION> <OPTION value=12>安徽省</OPTION> 
+                    <OPTION value=13>福建省</OPTION> <OPTION value=14>江西省</OPTION> 
+                    <OPTION value=15>山东省</OPTION> <OPTION value=16>河南省</OPTION> 
+                    <OPTION value=17>湖北省</OPTION> <OPTION value=18>湖南省</OPTION> 
+                    <OPTION value=19>广东省</OPTION> <OPTION 
+                    value=20>广西壮族自治区</OPTION> <OPTION value=21>海南省</OPTION> 
+                    <OPTION value=22>重庆市</OPTION> <OPTION value=23>四川省</OPTION> 
+                    <OPTION value=24>贵州省</OPTION> <OPTION value=25>云南省</OPTION> 
+                    <OPTION value=26>西藏自治区</OPTION> <OPTION 
+                    value=27>陕西省</OPTION> <OPTION value=28>甘肃省</OPTION> <OPTION 
+                    value=29>青海省</OPTION> <OPTION value=30>宁夏回族自治区</OPTION> 
+                    <OPTION value=31>新疆维吾尔自治区</OPTION> <OPTION 
+                    value=32>香港特别行政区</OPTION> <OPTION value=33>澳门</OPTION> 
+                    <OPTION value=34>台湾</OPTION></SELECT> <SELECT id=address2 
+                  onchange="address2change('',this.form)" name=address2> 
+                    <OPTION value=0 selected>请选择</OPTION></SELECT> <SELECT 
+                  id=address3 name=address3> <OPTION value=0 
+                    selected>请选择</OPTION></SELECT> <A 
+style="COLOR: red"></A></TD></TR>
+              
+              </TBODY></TABLE> <input  type="submit" value="TIJIAO" ></FORM></TD></TR></TBODY></TABLE></TD>
+    </TR></TBODY></TABLE>
+<STYLE type=text/css>.style2 {
+	FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+</STYLE>
+
+
+</DIV>
+</BODY></HTML>

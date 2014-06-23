@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//WebContent/WEB-INF/web.xml=UTF-8
+encoding//WebContent/about.jsp=gbk
+encoding//WebContent/admin/common/login.html=GBK
+encoding//WebContent/admin/index.jsp=gbk
+encoding//WebContent/admin/js/dwz.dialog.js=UTF-8
+encoding//WebContent/admin/js/dwz.util.number.js=UTF-8
+encoding//WebContent/admin/xheditor/xheditor_plugins/multiupload/multiupload.js=UTF-8
+encoding//WebContent/head.jsp=GBK
+encoding//WebContent/views.jsp=GBK

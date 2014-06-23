@@ -1,0 +1,24 @@
+<% UserService services = new UserService();
+		List results = null;
+		
+		results = services.getSubjectList(1);
+			for(int i=0;i<results.size();i++){
+			Subject subject  =(Subject)results.get(i);
+			%>		
+					<li  ><a href="columnGods.jsp?column=<%=subject.getId().toString() %>"  <%if(column.equals(subject.getId().toString())) {%>  style="background-color:#93ac64; color:#FFF" <%}%>    ><%=subject.getFirstname() %></a></li>
+			<%
+			} %>
+			
+			
+			
+			
+			<% UserService services = new UserService();
+		List results = null;
+		
+		results = services.getSubjectList(1);
+			for(int i=0;i<results.size();i++){
+			Subject subject  =(Subject)results.get(i);
+			%>		
+					<li  ><a href="columnGods.jsp?column=<%=subject.getId().toString() %>"  <%if(column.equals(subject.getId().toString())) {%>  style="background-color:#93ac64; color:#FFF" <%}%>    ><%=subject.getFirstname() %></a></li>
+			<%
+			} %>
