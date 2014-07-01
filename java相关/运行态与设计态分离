@@ -1,0 +1,49 @@
+运行态与设计态分离
+
+一。首先理清目前运行态与设计态的细节
+
+baseview
+
+1.初始化，环境等，比如subviews，parentview，type等
+2.根据json中的dataElement或config中的dataElements配置，初始化数据元素数据
+3.根据json中的attrs以及配置中的attrs，初始化 组件的属性数据。
+4.根据json中的children数据，require子view并初始化，设置relation
+5.render 方法，根据subview逐一append
+
+
+baseeditorview
+
+1.运行baseview的构造函数，也就是运行baseview的1-2-3-4
+2.处理attrs中的属性改变后，重新render方法
+3.处理可添加子组件的一点问题
+4.封装一些 add remove subview superview的通用处理，因为设计态会涉及到动态修改
+5.toJson，处理保存样式json的问题
+
+
+baseruntimeview
+1.运行baseview的构造函数，也就是运行baseview的1-2-3-4
+2.处理数据格式初始化,从object转换为model
+3.处理data-bind，也就是 dom 到 data的绑定
+4.render,处理data->dom的绑定
+
+
+二。总结
+简而言之:
+baseview：
+	1）。初始化变量
+	2).初始化dataElement
+	3).初始化Attrs
+	4).递归初始化并创建child
+	5).append 子view
+
+baseEditorView
+	1)。以上baseview的初始化
+	2). 绑定attrs：change，组件rerender
+	3).封装 add remove del等子view操作处理
+	4）。保存样式toJson
+
+baseRentimeView
+	1)。以上baseview的初始化
+	2)。初始化data数据(model)
+	3).处理dom->data的绑定
+	4).处理data->dom的绑定

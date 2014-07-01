@@ -1,0 +1,327 @@
+ant常用task笔记
+
+官网API地址：http://ant.apache.org/manual/index.html
+一。Archive Tasks，档案类task
+
+	1.bunzip2
+		解压缩
+
+	2.bzip2
+		压缩
+		<gzip src="${test.dir}/test/1.xml" zipfile="1.zip" />
+		zipfile / destfile 必须有一个存在
+	3.cab
+	4.ear
+	5.gunzip
+	6.jar
+	7.jlink
+	8.manifet
+	9.rpm
+	10.signjar
+	11.tar
+	12.unjar
+	13.untar
+	14.unzip
+	15.war
+	16.zip
+
+
+二。Audit/Coverage Tasks
+	
+	1.jdepend
+
+三。Compile Tasks 编译类tasks
+
+	1.depend
+	2.javac---众所周知啊·
+	3.apt
+	4.jspc
+	5.netrexxc
+	6.rmic
+	7.wljspc
+
+四。Deployment Tasks 部署类task
+
+	serverdeplloy
+
+五。Documenttation Tasks 文档类
+
+	1.javadoc/javadoc2
+
+六。EJB Tasks
+	1.ejb tasks
+
+七。Execution Tasks 执行类task
+
+	1.ant
+		执行指定build文件中target
+		output:输出结果到指定文件
+		inheritAll:新ant可以使用当前文件所有的properties，默认true
+		inheritRefs:新ant可以使用当前文件所有的references，默认false
+		useNativeBasedir:是否使用commandline的 basedir
+		<ant antfile="other.xml" dir="test" target="build" output="1.log">
+			<property name="param1" value="version 1.x"/>
+			<property file="config/subproject/default.properties"/>
+		</ant>
+	2.antcall
+		调用当前文件中的其他的target
+		antcall是以一个新的project执行的，默认会传递所有的属性到新的target,
+		可以通过param传递参数到新的target。
+		同样的，antcall执行的target也不会覆盖当前的properties
+		inheritAll:新ant可以使用当前文件所有的properties，默认true
+		inheritRefs:新ant可以使用当前文件所有的references，默认false
+		<antcall target="doSomethingElse">
+    		<param name="param1" value="value"/>
+  		</antcall>
+  		<antcall target="module-combine-enable"></antcall>
+	3.apply/execon
+		execon名称已经弃用··
+		执行系统命令
+	4.dependset
+		比较源文件集合与目的文件集合，如何源中的文件比目的文件 更最近修改的话，则删除相关的文件
+	5.exec
+		执行系统命令，跟操作系统有关
+		command:可带参数
+		executable:不带参数,
+		arg：参数
+		env:环境变量设置
+		<exec dir="${dir.name}" executable="${v6.git.dir}/yfui/tools/ant/bin/ant">
+        </exec>
+
+        <exec executable="java">
+                    <!--use exec to change file encoding-->
+                    <arg value="-Dfile.encoding=${charset}"/>
+                    <arg value="-jar"/>
+                    <arg value="${js-cover}"/>
+                    <arg value="-fs"/>
+                    <arg value="${component.src.dir}"/>
+                    <arg value="${component.coverage.dir}"/>
+                    <env key="PATH" path="${env.PATH}:${basedir}/bin"/>
+        </exec>
+	6.java
+		执行java class
+	7.parallel
+	8.sequential
+	9.sleep
+	10.subant
+	11.waitfor
+
+八。File Tasks 文件目录类Task
+
+	1.attrib
+	2.checksum
+	3.chgrp
+	4.chmod
+		设置指定目录中的文件权限
+		<chmod dir="${dist}/bin" perm="ugo+rx" includes="**/*.sh"/>
+	5.chown
+	6.concat
+		合并多个文件到指定文件或控制台
+		destfile：指定合并到的文件，如果没有设置则输出到控制台
+		append：destfile是否使用追加模式
+		overwrite:是否覆盖模式
+		fixlastline:每个文件结束是否使用新行
+		eol:
+		binary:是否是二进制文件,如果是二进制文件，fixlastline encode等不起作用
+		<concat destfile="README">Hello, World!</concat>
+
+		<concat destfile="NOTES" append="true">
+    <filelist dir="notes" files="note.txt"/>
+  </concat>
+	7.copy
+		复制文件或目录
+	8.copydir
+		已废弃
+	9.copyfile
+		已废弃
+	10.delete
+		删除
+	11.deltree
+		已废弃
+	11.filter
+	12.fixcrlf
+	13.get
+	14.mkdir
+	15.move
+		移动文件或目录
+	16.patch
+	17.rename
+		已废弃
+	18.renameextensions
+		已废弃
+	19.replace
+		替换文件内容
+			<replace file="${src}/index.html" token="@@@" value="wombat"/>
+			<replace 
+			    file="configure.sh"
+			    value="defaultvalue"
+			    propertyFile="src/name.properties">
+					<replacefilter>
+		    			<replacetoken>@token4@</replacetoken> 
+		    			<replacevalue>value4</replacevalue>
+  					</replacefilter>
+  			</replace>
+  			<replace dir="${src}" value="wombat">
+			  	<include name="**/*.html"/>
+			  	<replacetoken><![CDATA[multi linetoken]]></replacetoken>
+			</replace>
+
+	20.replaceregexp
+		正则替换文件内容
+
+	21.sync
+	22.tempfile
+	23.touch
+
+九。Java2 Extensions Tasks
+	省略···
+
+十。Logging Tasks
+
+	1.record
+
+十一。MailTasks 邮件类
+	
+	1.Mail
+		发送smtp邮件
+
+		<mail mailhost="somehost@xyz.com" mailport="25" subject="Test build"  charset="utf-8">
+			  <from address="me@myist.com"/>
+			  <to address="all@xyz.com"/>
+			  <message>some international text:${line2}</message>
+		</mail>
+	2.minemail
+		已废弃
+
+十二。Miscellaneous Tasks 其他类
+
+	1.defaultexclueds
+	2.echo
+		输出消息到控制台或文件
+		level:类似日志系统的level
+		<echo file="runner.csh" append="false">#\!/bin/tcsh
+			java-1.3.1 -mx1024m ${project.entrypoint} $$*
+		</echo>
+	3.fail
+	4.genkey
+	5.hostinfo
+	6.input
+	7.script
+	8.sound
+		播放声音，通常用来提示build成功还是失败
+
+		<target name="fun" if="fun" unless="fun.done">
+		  <sound>
+		    <success source="${user.home}/sounds/bell.wav"/>
+		    <fail source="${user.home}/sounds/ohno.wav" loops="2"/>
+		  </sound>
+		  <property name="fun.done" value="true"/>
+		</target>
+	09.splash
+	10.sql
+		通过jdbc执行sql操作
+	11.taskdef
+		添加一个自定义的新task，
+		<taskdef name="myjavadoc" classname="com.mydomain.JavadocTask"/>
+	12.tstamp
+	13.typedef
+		添加一个自动议的task或者task集合
+		<taskdef uri="antlib:net.sf.antcontrib" resource="net/sf/antcontrib/antlib.xml" classpath="path/to/ant-contrib.jar"/>
+		<typedef name="runclock" classname="com.acme.ant.RunClock" adapter="org.acme.ant.RunnableAdapter"/>
+	14.tstamp
+	15.typedef
+	16.xmlValidate
+
+十三。Pre-process Tasks
+	1.import 
+		导入其他的build文件
+	2.include
+		包含其他的build文件
+	......
+	两者的区别是:
+		import 会覆盖target，
+		include不会
+
+		<include file="nested.xml" as="nested"/>
+
+十四。Property Tasks
+	1.available
+		设置一个显示资源是否可用的属性，这个资源可以是文件，目录，java类，
+
+		<available classname="org.whatever.Myclass" property="Myclass.present"/>
+		<available file="${jaxp.jar}" property="jaxp.jar.present"/>
+		<available property="have.extras" resource="extratasks.properties">
+		  <classpath>
+		    <pathelement location="/usr/local/ant/extra.jar" />
+		  </classpath>
+		</available>
+	2.basename
+	3.buildnumber
+	4.condition
+	5.dirname
+	6.echoproperties
+	7.loadfile
+	8.loadproperties
+	9.makeurl
+	10.pathconvert
+	11.property
+	12.propertyfile
+	13.uptodate
+	14.whichresource
+	15.xmlproperty
+
+十五。Remote Tasks
+	
+	1.ftp
+	2.rexec
+	3.scp
+	4.setproxy
+	5.sshexec
+	6.telnet
+
+十六。SCM Tasks
+	....
+
+十七。Testing Tasks
+
+十八。其他:
+	1.if 分支结构
+		<target name='version'>
+        <if>
+            <and>
+                <equals arg1="${build.pattern}" arg2="@YF-DEBUG@"/>
+                <equals arg1="${component.independent}" arg2="true"/>
+            </and>
+            <then>
+                <antcall target="version-debug"></antcall>
+            </then>
+            <elseif>
+                <and>
+                    <equals arg1="${build.pattern}" arg2="@YF-PUBLISH@"/>
+                    <equals arg1="${component.independent}" arg2="true"/>
+                </and>
+                <then>
+                    <antcall target="version-publish"></antcall>
+                </then>
+            </elseif>
+        </if>
+    	</target>
+
+    2.时间
+    	<tstamp>
+            <format property="tag.time" pattern="yyyyMMddhhmmss"/>
+        </tstamp>
+    3.动态获取属性(Dynamic property names)
+    	多种方案，需要扩展包的支持,最简单的方案是用AntContrib 的propertycopy
+    	http://ant.apache.org/faq.html#propertyvalue-as-name-for-property
+    	<propertycopy name="component.version" from="${component.version.id}"/>
+    4.for循环
+    	<foreach target="list.dir" param="dir.name">
+            <path>
+                <dirset dir="${v6.git.dir}" includes="form,business,designer,v6desktop,custom-func,data-source,c" excludes=".metadata" />
+            </path>
+        </foreach>
+
+    5.Math操作
+
+
