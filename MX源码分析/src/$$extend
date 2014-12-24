@@ -1,0 +1,104 @@
+
+
+var $$extend = function(_class_,protoProps) {
+    var parent = _class_;
+    var child;
+
+    if (protoProps && _.has(protoProps, 'constructor')) {
+      child = protoProps.constructor;
+    } else {
+      child = function(){ return parent.apply(this, arguments); };
+    }   
+
+    _.extend(child, parent);
+
+    // Set the prototype chain to inherit from `parent`, without calling
+    // `parent`'s constructor function.
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+
+    // Add prototype properties (instance properties) to the subclass,
+    // if supplied.
+    if (protoProps) _.extend(child.prototype, protoProps);
+
+    // Set a convenience property in case the parent's prototype is needed
+    // later.
+    child.__super__ = parent.prototype;
+
+    return child;
+  };
+
+
+mx.test = function(){
+
+
+
+	return $$extend(mx.window,{
+
+		init:function(){
+			this.super('init')();
+		},
+
+
+
+
+	});
+}
+
+function $extend(p_baseClass)
+    {
+        if (typeof(p_baseClass) == "function")
+        {
+            var inst = new p_baseClass();
+            inst.__class__ = $extend.caller;
+            if (p_baseClass != MXObject && p_baseClass != MXComponent)
+            {
+                inst.__superClasses__.push(p_baseClass);
+            }
+            return inst;
+        }
+    }
+
+
+
+me.endOfClass = function(p_arguments)
+    {
+        if (me.__class__.caller != $extend)
+        {
+            me._(p_arguments[0]);
+        }
+        return me;
+    };
+
+
+    me._ = function(p_options)
+    {
+        if (me.canConstruct())
+        {
+            if ($.isPlainObject(p_options))
+            {
+                var isEventDispatcher = typeof (me.on) == "function";
+                for ( var key in p_options)
+                {
+                    var option = p_options[key];
+                    if (isEventDispatcher && typeof (me[key]) == "object"
+                            && typeof (option) == "function"
+                            && key.startsWith("on"))
+                    {
+                        me.on(key.substr(2), option);
+                    }
+                    else
+                    {
+                        me[key] = option;
+                    }
+
+                    option = null;
+                    p_options[key] = null;
+                }
+            }
+            me.constructed = true;
+
+            p_options = null;
+        }
+    };

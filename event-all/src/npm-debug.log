@@ -1,0 +1,21 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'D:\\Program Files\\nodejs\\\\node.exe',
+1 verbose cli   'D:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'run',
+1 verbose cli   'build' ]
+2 info using npm@1.4.9
+3 info using node@v0.10.28
+4 verbose node symlink D:\Program Files\nodejs\\node.exe
+5 error Error: ENOENT, open 'D:\git-hub\front-road\event-all\src\package.json'
+6 error If you need help, you may report this *entire* log,
+6 error including the npm and node versions, at:
+6 error     <http://github.com/npm/npm/issues>
+7 error System Windows_NT 6.1.7601
+8 error command "D:\\Program Files\\nodejs\\\\node.exe" "D:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "run" "build"
+9 error cwd D:\git-hub\front-road\event-all\src
+10 error node -v v0.10.28
+11 error npm -v 1.4.9
+12 error path D:\git-hub\front-road\event-all\src\package.json
+13 error code ENOENT
+14 error errno 34
+15 verbose exit [ 34, true ]

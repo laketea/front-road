@@ -1,0 +1,461 @@
+#Jquery事件源码注释
+
+---
+
+
+	jQuery.event = {
+		global:{},
+		add: function( elem, types, handler, data, selector ) {
+			var tmp, events, t, handleObjIn,
+				special, eventHandle, handleObj,
+				handlers, type, namespaces, origType,
+				elemData = jQuery._data( elem );
+
+			// Don't attach events to noData or text/comment nodes (but allow plain objects)
+			// elemData是dom上的缓存data对象，如果elemData不存在，则说明此dom不是可缓存数据dom，则返回。
+			// 什么类型的dom是不可缓存data？
+			if ( !elemData ) {
+				return;
+			}
+
+			// Caller can pass in an object of custom data in lieu of the handler
+			// 如果handler是已经封装过的handler，
+			//取出handler，实际的handler，也就是从on方法传递过来的fn参数
+				
+			if ( handler.handler ) {
+				handleObjIn = handler;
+				handler = handleObjIn.handler;
+				selector = handleObjIn.selector;
+			}
+
+			// Make sure that the handler has a unique ID, used to find/remove it later
+			if ( !handler.guid ) {
+				handler.guid = jQuery.guid++;
+			}
+
+			// Init the element's event structure and main handler, if this is the first
+			// 如果！data.events ，则初始化data.events = {}
+			if ( !(events = elemData.events) ) {
+				events = elemData.events = {};
+			}
+			if ( !(eventHandle = elemData.handle) ) {
+				//初始化一个执行事件函数的函数,这个eventHandle是真正绑定到dom 本地事件上的函数
+				eventHandle = elemData.handle = function( e ) {
+					// Discard the second event of a jQuery.event.trigger() and
+					// when an event is called after a page has unloaded
+					return typeof jQuery !== strundefined && (!e || jQuery.event.triggered !== e.type) ?
+						jQuery.event.dispatch.apply( eventHandle.elem, arguments ) :
+						undefined;
+				};
+				//避免IE中非本地事件的内存泄漏 ，IE中的非本地事件内存泄露？
+				// Add elem as a property of the handle fn to prevent a memory leak with IE non-native events
+				eventHandle.elem = elem;
+			}
+
+			// Handle multiple events separated by a space
+			types = ( types || "" ).match( rnotwhite ) || [ "" ];
+			t = types.length;
+			while ( t-- ) {
+				tmp = rtypenamespace.exec( types[t] ) || [];
+				type = origType = tmp[1];
+				namespaces = ( tmp[2] || "" ).split( "." ).sort();
+
+				// There *must* be a type, no attaching namespace-only handlers
+				if ( !type ) {
+					continue;
+				}
+
+				//有些事件会改变事件的type，故判断type，如果改变了则使用type对应的special-event
+				// If event changes its type, use the special event handlers for the changed type
+				special = jQuery.event.special[ type ] || {};
+				// If selector defined, determine special event api type, otherwise given type
+				type = ( selector ? special.delegateType : special.bindType ) || type;
+				// Update special based on newly reset type
+				special = jQuery.event.special[ type ] || {};
+
+				// handleObj is passed to all event handlers
+				// handleObj对象
+				handleObj = jQuery.extend({
+					type: type,
+					origType: origType,
+					data: data,
+					handler: handler,
+					guid: handler.guid,
+					selector: selector,
+					needsContext: selector && jQuery.expr.match.needsContext.test( selector ),
+					namespace: namespaces.join(".")
+				}, handleObjIn );
+
+				// Init the event handler queue if we're the first
+				// handlers为对应type的handlers，从这里可以判断，
+				// 一种type类型的事件，在dom上只绑定一次
+				if ( !(handlers = events[ type ]) ) {
+					handlers = events[ type ] = [];
+					handlers.delegateCount = 0;
+
+					// Only use addEventListener/attachEvent if the special events handler returns false
+					// 如果特殊事件没有setup或者setup返回false，则用js原生对象绑定事件
+					if ( !special.setup || special.setup.call( elem, data, namespaces, eventHandle ) === false ) {
+						// Bind the global event handler to the element
+						if ( elem.addEventListener ) {
+							//其他浏览器绑定事件，false，冒泡阶段捕获
+							elem.addEventListener( type, eventHandle, false );
+						} else if ( elem.attachEvent ) {
+							//IE绑定事件的方式
+							elem.attachEvent( "on" + type, eventHandle );
+						}
+					}
+				}
+
+				if ( special.add ) {
+					special.add.call( elem, handleObj );
+
+					if ( !handleObj.handler.guid ) {
+						handleObj.handler.guid = handler.guid;
+					}
+				}
+
+				// Add to the element's handler list, delegates in front
+				// 将handleObj 加入到handlers的数组中，jquery.event.dispatch如何取handleObj？
+				if ( selector ) {
+					//如果selector存在，则说明是委托事件，则从delegateCount++的位置插入handleObj why？
+					handlers.splice( handlers.delegateCount++, 0, handleObj );
+				} else {
+					handlers.push( handleObj );
+				}
+
+				// Keep track of which events have ever been used, for event optimization
+				jQuery.event.global[ type ] = true;
+			}
+
+			// Nullify elem to prevent memory leaks in IE
+			// 避免IE中的内存泄露
+			elem = null;
+		},
+		remove:function{},
+		trigger:function(){},
+		dispatch: function( event ) {
+
+			// Make a writable jQuery.Event from the native event object
+			// 将原生event包装为$event,jquery-event
+			event = jQuery.event.fix( event );
+
+			var i, ret, handleObj, matched, j,
+				handlerQueue = [],
+				args = slice.call( arguments ),
+				handlers = ( jQuery._data( this, "events" ) || {} )[ event.type ] || [],//根据event。Type取出dom上面type对应handlerObjs
+				special = jQuery.event.special[ event.type ] || {};
+
+			// Use the fix-ed jQuery.Event rather than the (read-only) native event
+			args[0] = event;
+			event.delegateTarget = this;
+
+			// Call the preDispatch hook for the mapped type, and let it bail if desired
+			if ( special.preDispatch && special.preDispatch.call( this, event ) === false ) {
+				return;
+			}
+
+			// Determine handlers
+			// 通过event.handlers排序出handerQueue（根据委托节点的深度以及绑定的先后顺序）
+			handlerQueue = jQuery.event.handlers.call( this, event, handlers );
+
+			// Run delegates first; they may want to stop propagation beneath us
+			i = 0;
+
+			//遍历handler队列，如果event阻止冒泡，则不执行队列中剩下的obj
+			while ( (matched = handlerQueue[ i++ ]) && !event.isPropagationStopped() ) {
+				event.currentTarget = matched.elem;
+
+				j = 0;
+				//遍历matched.handlers,如果isImmediatePropagationStopped，则停止执行剩余的事件
+				while ( (handleObj = matched.handlers[ j++ ]) && !event.isImmediatePropagationStopped() ) {
+
+					// Triggered event must either 1) have no namespace, or
+					// 2) have namespace(s) a subset or equal to those in the bound event (both can have no namespace).
+					if ( !event.namespace_re || event.namespace_re.test( handleObj.namespace ) ) {
+
+						event.handleObj = handleObj;
+						event.data = handleObj.data;
+
+						ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler )
+								.apply( matched.elem, args );
+
+						if ( ret !== undefined ) {
+							//如果ret = false,并且event.reulst = false,则停止冒泡，阻止事件默认行为
+							if ( (event.result = ret) === false ) {
+								event.preventDefault();
+								event.stopPropagation();
+							}
+						}
+					}
+				}
+			}
+
+			// Call the postDispatch hook for the mapped type
+			if ( special.postDispatch ) {
+				special.postDispatch.call( this, event );
+			}
+
+			return event.result;
+		},
+		handlers: function( event, handlers ) {
+			var sel, handleObj, matches, i,
+				handlerQueue = [],
+				delegateCount = handlers.delegateCount,
+				cur = event.target;
+			//cur为事件的冒泡起始dom
+			// Find delegate handlers
+			// Black-hole SVG <use> instance trees (#13180)
+			// Avoid non-left-click bubbling in Firefox (#3861)
+			if ( delegateCount && cur.nodeType && (!event.button || event.type !== "click") ) {
+
+				/* jshint eqeqeq: false */
+				//从最底层cur往父级遍历，直至this（this就是事件监听的dom）
+				//这段代码的主要意思是，将handleObj按照委托节点的层次的深度以及先后顺序分类，层次越深，越先绑定的事件，则执行的优先级越高
+				for ( ; cur != this; cur = cur.parentNode || this ) {
+					/* jshint eqeqeq: true */
+
+					// Don't check non-elements (#13208)
+					// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
+					if ( cur.nodeType === 1 && (cur.disabled !== true || event.type !== "click") ) {
+						matches = [];
+						//遍历委托的handlers
+						for ( i = 0; i < delegateCount; i++ ) {
+							handleObj = handlers[ i ];
+
+							// Don't conflict with Object.prototype properties (#13203)
+							sel = handleObj.selector + " ";
+							//判断cur dom是否包含seldom，
+							if ( matches[ sel ] === undefined ) {
+								matches[ sel ] = handleObj.needsContext ?
+									jQuery( sel, this ).index( cur ) >= 0 :
+									jQuery.find( sel, this, null, [ cur ] ).length;
+							}
+							//如果cur dom包含sel，将handleObj存入数组中
+							//语义上理解，就是说，如果cur为selector，则将handleObj存入数组中
+							if ( matches[ sel ] ) {
+								matches.push( handleObj );
+							}
+						}
+						//从target dom开始，每一层dom如果有符合的委托dom，则往handlerQueue 存入一个对象，
+						//该对象handlers属性，包含当前dom相关的委托handleObj
+						if ( matches.length ) {
+							handlerQueue.push({ elem: cur, handlers: matches });
+						}
+					}
+				}
+			}
+
+			//最后将非委托的事件作为一个obj push 到队列中。故非委托事件是最后执行的
+			// Add the remaining (directly-bound) handlers
+			if ( delegateCount < handlers.length ) {
+				handlerQueue.push({ elem: this, handlers: handlers.slice( delegateCount ) });
+			}
+
+			return handlerQueue;
+		},
+		fix: function( event ) {
+			if ( event[ jQuery.expando ] ) {
+				return event;
+			}
+
+			// Create a writable copy of the event object and normalize some properties
+			var i, prop, copy,
+				type = event.type,
+				originalEvent = event,
+				fixHook = this.fixHooks[ type ];
+
+			if ( !fixHook ) {
+				this.fixHooks[ type ] = fixHook =
+					rmouseEvent.test( type ) ? this.mouseHooks :
+					rkeyEvent.test( type ) ? this.keyHooks :
+					{};
+			}
+			copy = fixHook.props ? this.props.concat( fixHook.props ) : this.props;
+
+			event = new jQuery.Event( originalEvent );
+
+			i = copy.length;
+			while ( i-- ) {
+				prop = copy[ i ];
+				event[ prop ] = originalEvent[ prop ];
+			}
+
+			// Support: IE<9
+			// Fix target property (#1925)
+			if ( !event.target ) {
+				event.target = originalEvent.srcElement || document;
+			}
+
+			// Support: Chrome 23+, Safari?
+			// Target should not be a text node (#504, #13143)
+			if ( event.target.nodeType === 3 ) {
+				event.target = event.target.parentNode;
+			}
+
+			// Support: IE<9
+			// For mouse/key events, metaKey==false if it's undefined (#3368, #11328)
+			event.metaKey = !!event.metaKey;
+
+			return fixHook.filter ? fixHook.filter( event, originalEvent ) : event;
+		},
+		props:"",
+		fixHooks:{},
+		keyHooks:{},
+		special:{},
+		mouseHooks: {
+			props: "button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement".split(" "),
+			filter: function( event, original ) {
+				var body, eventDoc, doc,
+					button = original.button,
+					fromElement = original.fromElement;
+
+				// Calculate pageX/Y if missing and clientX/Y available
+				if ( event.pageX == null && original.clientX != null ) {
+					eventDoc = event.target.ownerDocument || document;
+					doc = eventDoc.documentElement;
+					body = eventDoc.body;
+
+					event.pageX = original.clientX + ( doc && doc.scrollLeft || body && body.scrollLeft || 0 ) - ( doc && doc.clientLeft || body && body.clientLeft || 0 );
+					event.pageY = original.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
+				}
+
+				// Add relatedTarget, if necessary
+				if ( !event.relatedTarget && fromElement ) {
+					event.relatedTarget = fromElement === event.target ? original.toElement : fromElement;
+				}
+
+				// Add which for click: 1 === left; 2 === middle; 3 === right
+				// Note: button is not normalized, so don't use it
+				if ( !event.which && button !== undefined ) {
+					event.which = ( button & 1 ? 1 : ( button & 2 ? 3 : ( button & 4 ? 2 : 0 ) ) );
+				}
+
+				return event;
+			}
+		},
+
+		special:{},
+		simulate:function(){}
+	};
+
+	jQuery.removeEvent ;
+
+	jQuery.Event = function(src,props){
+	}
+
+	jQuery.Event.prototype = {
+
+		isDefaultPrevented: returnFalse,
+		isPropagationStopped: returnFalse,
+		isImmediatePropagationStopped: returnFalse,
+		preventDefault: function() {},
+		stopPropagation: function() {},
+		stopImmediatePropagation: function() {}
+	}
+
+
+	// IE submit delegation
+	if ( !support.submitBubbles ) {
+
+		...
+	}
+
+
+	jQuery.fn.extend({
+
+		on: function( types, selector, data, fn, /*INTERNAL*/ one ) {
+			var type, origFn;
+
+			// Types 可以是types/handlers的键值对
+			if ( typeof types === "object" ) {
+				// ( types-Object, selector, data )
+				if ( typeof selector !== "string" ) {
+					// ( types-Object, data )
+					data = data || selector;
+					selector = undefined;
+				}
+				for ( type in types ) {//处理绑定多个事件
+					//这种递归的写法可以借鉴，如果自己写的话，往往再外层加一个函数，来判断types的类型
+					//这种写法更精简
+					this.on( type, selector, data, types[ type ], one );
+				}
+				return this;
+			}
+
+			// 为何不用{}的方式处理这种参数数量多变的情况，考虑下主要是为了方便使用吧，虽然代码处理上要复杂些，但是使用起来更灵活
+			// 对于多个可变参数，可以借鉴此种方式
+			//参数有如下几种方式：
+			// (types, selector, data, fn, one)
+			// (types,fn)
+			// (types,selector,fn)
+			// (types,data,fn)
+			if ( data == null && fn == null ) {
+				// ( types, fn )
+				fn = selector;
+				data = selector = undefined;
+			} else if ( fn == null ) {
+				if ( typeof selector === "string" ) {
+					// ( types, selector, fn )
+					fn = data;
+					data = undefined;
+				} else {
+					// ( types, data, fn )
+					fn = data;
+					data = selector;
+					selector = undefined;
+				}
+			}
+			if ( fn === false ) {
+				fn = returnFalse;
+			} else if ( !fn ) {
+				return this;
+			}
+
+			//如果是one一次性触发
+			if ( one === 1 ) {
+				origFn = fn;
+				//将fn包装了一下，先off事件，再调用事件绑定的实际函数
+				fn = function( event ) {
+					// Can use an empty set, since event contains the info
+					jQuery().off( event );
+					return origFn.apply( this, arguments );
+				};
+				// Use same guid so caller can remove using origFn
+				fn.guid = origFn.guid || ( origFn.guid = jQuery.guid++ );
+			}
+			return this.each( function() {
+				jQuery.event.add( this, types, fn, data, selector );
+			});
+		},
+
+		one:function(){},
+
+		off: function( types, selector, fn ),
+
+		trigger: function( type, data ) {},
+
+		triggerHandler: function( type, data ) {}
+
+	});
+
+	jQuery.each( ("blur focus focusin focusout load resize scroll unload click dblclick " +
+		"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+		"change select submit keydown keypress keyup error contextmenu").split(" "), function( i, name ) {
+
+		// 将常用事件暴露到jquery公共接口中，方便事件绑定
+		jQuery.fn[ name ] = function( data, fn ) {
+			return arguments.length > 0 ?
+				this.on( name, null, data, fn ) :// 如果有参数，则调用on绑定事件，
+				this.trigger( name );//如果参数为空，则触发对应的事件
+		};
+	});
+
+	jQuery.fn.extend({
+		hover: function( fnOver, fnOut ) {},
+		bind: function( types, data, fn ) {},
+		unbind: function( types, fn ) {},
+		delegate: function( selector, types, data, fn ) {},
+		undelegate: function( selector, types, fn ) {}
+	});
+

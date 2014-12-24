@@ -1,0 +1,218 @@
+#MX-JS启动初始化分析
+
+---
+
+###MX标签
+MX主要有如下两个标签
+- mx:Framework
+	主要负责mx库文件的引入以及css主题参数的设置，以及对ie6/7浏览器的chromeframe提示处理
+
+- mx:WebletContainer
+	这个标签的工作比较简单，就是用来初始对应的weblet，根据参数生产对于的js初始化代码
+	如下举例说明：
+	<mx:WebletContainer id="zzContainer" webletID="zz" bundleName="demo"></mx:WebletContainer>
+
+	<div id="zzContainer"></div>
+
+	<scritp>
+		var zzContainer = new mx.weblets.WebletContainer({
+			$e: $("#zzContainer"),
+			webletID:"zz",
+			bundleName:"demo"
+		});
+	</script>
+
+
+
+###WebletContainer分析
+mx.weblets.WebletContainer 继承自mx.views.ViewPort；
+
+
+weblet：weblet对象
+context：weblet上下文
+核心方法:
+- init
+	$e 添加样式webletContainer
+	$e 清空
+	base.init();
+
+	//根据参数来调用load方法；
+	me.load(me.webletID);
+	me.load({
+	    webletID:me.webletID,
+	    bundleName:me.bundleName
+	});
+
+- load
+
+	调用mx.weblets.WebletManager.load(_webletID,callback)来加载weblet,
+	callback应该是调用成功的回掉函数
+
+- 加载后的回调函数
+	
+	//
+	p_args.rootViewPort = me;
+	me.context = me.weblet.context;
+	mx.weblets.WebletManager.start(me.weblet, p_args);
+
+	me.trigger("webletload", {weblet: me.weblet});
+	
+
+###mx.weblets.WebletManager分析
+mx.weblets.WebletManager 是mx.weblets.WebletManagerClass类在系统中的单例对象
+主要用来管理weblets.
+
+weblets: weblet集合，数组
+bundles：bundle集合，数组
+
+核心方法：
+load：
+	判断weblets[webletID]（id对于的weblet）是否存在，如果存在则直接调用回调函数，
+	如果不存在则调用mx.weblets.WebletLoader.load(p_webletID, p_callback)，来加载weblet
+register：
+	判断是否对于的webletid是否存在，如果存在则error
+	 var weblet = new mx.weblets.Weblet(p_options);
+    me.weblets.add(weblet);
+    me.weblets[weblet.id] = weblet;
+    // 创建一个全局对象作为命名空间。
+    $global[weblet.id] = weblet;
+
+    创建全局对象空间，可以通过weblet的id访问到所有的weblet对象,
+
+    这里有个问题，多次加载一个页面是否会重复呢？
+    重复有两个方面的重复，一个是me.weblets,一个是$global,
+    如果是在不同的iframe里面，则window不同，则不会重复，
+
+    --
+    以view形式加载似乎不走weblet？如果是这样，岂不是只有一个weblet？
+
+
+start：
+	启动weblet，判断是否已经启动，如果没有启动，则weblet.trigger("start", p_args);
+	strat事件的p_args,主要包含两个参数:context,rootViewPort(也可能不存在，可能别的加载方式不存在viewport)
+	也就是触发onstart方法
+
+
+
+###mx.weblets.WebletLoader分析
+mx.weblets.WebletLoader 是mx.weblets.WebletLoaderClass的单例对象,主要负责weblet的加载
+
+核心方法：
+
+load:
+	分析出参数中的webletid,以及bundlename
+	如果bundle不存在，则初始化bundle
+		 mx.weblets.WebletManager.bundles.add(bundleName);
+         mx.weblets.WebletManager.bundles[webletID] = bundleName;
+	
+	根据是否是debugMode分别调用不同的函数来加载weblet，两个load本质的区别是一个是加载weblet.js，一个是加载weblet压缩后的js文件
+
+		if (!mx.debugMode)
+        {
+        	//运行态模式
+            _load(p_webletID, p_callback);
+        }
+        else
+        {
+        	//debug模式
+           _loadUnderDebugMode(p_webletID, p_callback);
+        }
+
+_load：
+	
+	var path = _getPath(p_webletID);
+	//运行模式下：path = 具体的weblet.js路径，例如：
+	//id = factorlist,则path = "~/factorlist/factorlist.weblet.js"
+	//此path对应的js文件即运行态weblet对于的压缩js文件。
+    mx.include(path, function(){
+        _loadcallback(p_webletID, p_callback);
+    });
+
+_loadUnderDebugMode：
+
+	var path = _getPath(p_webletID);
+	//path debug模式下，path =  webletID + ".weblet";；
+	//importClass函数或加载对应的weblet.js,也就是script下面的weblet.js文件。
+    // 如果是 Deubg 模式，先加载 weblet.js。
+    mx.importClass(path, function(){
+        _loadcallback(p_webletID, p_callback);
+    });
+
+
+###mx.weblets.Weblet
+weblet小程序类，也可以理解为一个jsmodule，
+继承自mxcomponet
+
+
+name，
+bundleName，
+context
+init：
+	主要是初始化WebletContext对象
+	me.context = new mx.weblets.WebletContext(
+    {
+        id : me.id,
+        name : me.name
+    });
+
+提供一下常用的函数以及方法：
+indicate：function(p_type, p_message, p_options)
+	在容器中统一显示提示，
+	info”、“warn”、“error”、“busy”、“user”。
+showerror： 显示错误
+mappath
+include
+
+//以下三个函数都是调用console实现。
+log：
+warn：
+error
+err：
+
+//参数
+onstart: function (e) {
+        var mvc = new zz.views.mainViewController();
+        //mvc的getView方法中，初始化具体的view
+        e.context.rootViewPort.setViewController(mvc);
+        //这里面负责将append $e
+    }
+
+
+
+###mx.weblets.WebletContext 分析
+作为webletContext上下文对象，如果从上下文的角度来理解的话，
+context应该是weblet范围内的全局共享对象了
+
+id：
+name：
+rootViewPort：
+windowManager：
+
+
+init函数的主要操作是:初始化windowManager
+
+ 				me.windowManager = new mx.windows.WindowManager(
+                {
+                    context : me
+                });
+
+
+
+
+###总结：
+
+mx:WebletContainer 标签：
+	负责在页面中嵌入初始化WebletContainer代码
+mx.weblets.WebletContainer
+	继承自viewport类。weblet容器类对象，每个weblet对于一个，初始化函数中，清理$e,并加载weblet,加载完成后并启动weblet，
+	这个对象就是context的rootViewPort
+mx.weblets.WebletManager
+	weblet管理类单例对象，负责加载/注册/启动 weblet，缓存了所有的weblet以及bundle
+mx.weblets.WebletLoader
+	weblet加载类单例对象，负责weblet的加载，启动这块对于debug模式与非debug模式做了区分
+mx.weblets.Weblet
+	weblet对象，可以理解为一个前端的子模块，包含一些常用的函数以及contenxt，weblet中的onstart中，再将具体的view初始化，这个点是真正的应用初始化
+mx.weblets.WebletContext
+	weblet上下文对象，目前初始化时，仅仅初始化了一个windowManager
+
+
