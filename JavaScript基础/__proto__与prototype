@@ -8,8 +8,7 @@
 
 ### __proto__
 __proto__是对象上的一个内置属性，当我们访问一个对象的属性时，如果这个对象内部不存在这个属性，那么他就会去__proto__里找这个属性，也就是原型链的概念  
-在javascript高级编程里面说到，创建构造函数新实例时，有一步 是 ‘将构造函数的作用域赋给新对象’，这一步大概可以理解为,将新对象的__proto__设置为构造函数  
-prototype。
+在javascript高级编程里面说到，创建构造函数新实例时，有一步 是 ‘将构造函数的作用域赋给新对象’，这一步大概可以理解为,将新对象的__proto__设置为构造函数的prototype。
 
 	var Person = function(name) {
 	    this.name = name;
@@ -63,3 +62,19 @@ constructor 指向对象的构造器
 	console.log(p.constructor === Object) // 对象直接量方式定义的对象其constructor为Object
 	console.log(p.constructor.prototype === Object.prototype) // 为true，不解释 
 
+
+__proto__:对象
+	对象的__proto__指向其构造函数的prototype,
+	Object->Function.prototype
+	Foo ->Foo.prototype
+
+	这里要区分一点：
+		function Foo(){};
+		var foo1 = new Foo();
+
+		Foo函数本身是通过Function创建的，故Foo.__proto__ = Function.prototype
+		foo1对象是通过Foo函数创建哦，故foo1.__proto__ = Foo.prototype;
+
+		另外由于Object 本身也是一种函数，故Object.__proto__ = Function.prototype;
+
+prototype：函数
