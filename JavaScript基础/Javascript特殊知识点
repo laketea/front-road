@@ -311,6 +311,11 @@ SpiderMonkey的怪癖
 			 
 			alert(a); // 1
 			alert(b); // undefined,b也声明了
+			
+7.stringify顺序的问题
+Properties of non-array objects are not guaranteed to be stringified in any particular order. Do not rely on ordering of properties within the same object within the stringification.
+不同的js引擎，object的属性可能不一样，故不同的js引擎中，stringify的结果可能不一样，但是同一个js环境下，同一对象的stringify是可以保证一致的
+http://stackoverflow.com/questions/8931967/is-there-a-deterministic-equivalent-of-json-stringify
 
 7.var / 变量 / 属性
 
