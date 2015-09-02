@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<body onmousemove=fun() style="background:#ff4400" mce_style="background:#ff4400">
+<div style="width:100%;height:100%;background:#e9ffe9;">
+<table border=1 cellpadding=15 cellspacing=15 style="position:relative;top:20;left:20;background:green;">
+<tr><td>
+<div onclick="show()" style="background:#0b9cfd;cursor:hand;color:;" mce_style="background:#0b9cfd;cursor:hand;color:;">
+Click here to show
+</div>
+</td></tr>
+</table>
+
+<div id=cs style="width:200px;margin-top:20%;background:#ff4400;color:#ffffff;"></div>
+</div>
+<mce:script type="text/javascript">
+function show(){
+alert("window.event.x:"+window.event.x+"/nwindow.event.y:"+window.event.y+"/nevent.clientX:"+event.clientX+"/nevent.clientY:"+event.clientY+"/nevent.offsetX:"+event.offsetX+"/nevent.offsetY:"+event.offsetY+"/nwindow.event.screenX:"+window.event.screenX+"/nwindow.event.screenY:"+window.event.screenY+"/nwindow.screen.width:"+window.screen.width+"/nwindow.screen.height:"+window.screen.height);
+}
+function fun(){
+	document.getElementById("cs").innerHTML="window.event.x:"+window.event.x+"<br>window.event.y:"+window.event.y;
+}
+</mce:script>
+</body>

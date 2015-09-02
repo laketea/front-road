@@ -4,10 +4,9 @@
 
 ###基本结构
 
-文件统一使用HTML5 <!DOCTYPE html>
+统一使用HTML5的标准文档类型：<!DOCTYPE html>；
 
-根据情况适当填写meta标签
-	必须申明文档的编码charset 推荐使用UTF-8编码<meta charset="utf-8"/>
+必须申明文档的编码charset 推荐使用UTF-8编码<meta charset="utf-8"/>
 	根据页面内容以及需求填写keywords/description
 	PC端网页，需要使用360meta标签，默认使用极速模式
 		<meta name="renderer" content="webkit"> 
@@ -22,6 +21,7 @@
 使用link将css文件引入，并置于head中
 使用script将js文件引入，并置于body底部（SPA应用不强制要求）
 除特殊页面外（邮件等），禁止写内联样式
+
 ###代码结构
 
 按照从上至下、从左到右的视觉顺序书写HTML结构
