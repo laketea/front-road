@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+</head>
+
+<body>
+
+    <div id="test" style="position:absolute;left:100px;top:100px;width:100px;height:30px;background-color:red">click me </div>
+</body>
+<script type="text/javascript">
+var deg = 0;
+var block = document.getElementById("test");
+// block.addEventListener('click', function() {
+//     var self = this;
+//     requestAnimationFrame(function change() {
+//         self.style.transform = 'rotate(' + (deg++) + 'deg)';
+//         requestAnimationFrame(change);
+//     });
+// });
+
+// block.addEventListener('click', function(){
+//   var self = this, startTime = Date.now(),
+//       duration = 1000;
+//   setInterval(function(){
+//     var p = (Date.now() - startTime) / duration;
+//     self.style.transform = 'rotate(' + (360 * p) +'deg)';
+//   }, 1000/60);
+// });
+
+// block.addEventListener('click', function(){
+//   var self = this, startTime = Date.now(),
+//       distance = 200, T = 2000;
+//   requestAnimationFrame(function step(){
+//     var p = Math.min(1.0, (Date.now() - startTime) / T);
+//     self.style.transform = 'translateX(' + (distance * p) +'px)';
+//     if(p < 1.0) requestAnimationFrame(step);
+//   });
+// });
+
+var deg = 0;
+block.addEventListener("click", function(){
+  setInterval(function(){
+    var i = 0;  
+    var t = Date.now();
+    while(++i < 200000000); //模拟耗时操作
+    console.log(Date.now() - t);
+  }, 100);
+
+  var self = this;
+  requestAnimationFrame(function change(){
+    self.style.transform = "rotate(" + (deg++) +"deg)";
+    requestAnimationFrame(change);
+  });
+});
+</script>
+
+</html>
