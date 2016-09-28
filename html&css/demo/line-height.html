@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>line-height</title>
+</head>
+<style type="text/css">
+* {
+    font-size: 14px;
+    line-height: 2;
+}
+
+</style>
+
+<body>
+<h2>demo1：图片与容器的空白区域</h2>
+<div id="demo1" style="border:1px solid #ccc;width:500px;">
+    <img height="100" src="http://img.mp.itc.cn/upload/20160323/ebfce2b87c7a4a8cbe9bd43b592aa22c_th.jpg" />
+</div>
+
+<h2>demo2：包含多个第一组vertical-algin属性值的元素</h2>
+<div id="demo2" style="border:1px solid #ccc;width:500px;">
+    <img height="100" style="vertical-align:text-bottom" src="http://img.mp.itc.cn/upload/20160323/ebfce2b87c7a4a8cbe9bd43b592aa22c_th.jpg" />
+    <span>baseline文本:xx</span>
+    <span style="line-height:70px;vertical-align:text-top">text-top:xxx</span>
+</div>
+
+<h2>demo3：包含多个第二组vertical-algin属性值的元素</h2>
+<div id="demo3" style="border:1px solid #ccc;width:500px;">
+    <img height="100" style="vertical-align:top" src="http://img.mp.itc.cn/upload/20160323/ebfce2b87c7a4a8cbe9bd43b592aa22c_th.jpg" />
+    <span style="line-height:150px;vertical-align:bottom">bottom:xxx</span>
+</div>
+</body>
+
+<h2>demo4：包含多个多种类vertical-algin属性值的元素</h2>
+<div id="demo4" style="border:1px solid #ccc;width:700px;">
+    <img height="100" style="vertical-align:top" src="http://img.mp.itc.cn/upload/20160323/ebfce2b87c7a4a8cbe9bd43b592aa22c_th.jpg">
+    <span style="vertical-align: text-bottom;line-height: 100px;">text-bottom文本:xxx</span>
+    <span style="line-height:100px;vertical-align: text-top;">text-top文本:xxx</span>
+    <span style="line-height:150px;vertical-align:bottom">bottom:xxx</span>
+    <span>baseline文本:xxx</span>
+</div>
+</body>
+
+</html>
