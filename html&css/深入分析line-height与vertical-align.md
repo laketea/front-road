@@ -150,6 +150,7 @@ image为不可替换内联元素，image的默认vertical-algin为baseline,故im
 
 #### demo4: 含混多个多种vertical-algin属性值的元素
 代码：
+
 	<h2>demo4：包含多个多种类vertical-algin属性值的元素</h2>
 	<div id="demo4" style="border:1px solid #ccc;width:700px;">
 	    <img height="100" style="vertical-align:top" src="http://img.mp.itc.cn/upload/20160323/ebfce2b87c7a4a8cbe9bd43b592aa22c_th.jpg">
@@ -158,6 +159,7 @@ image为不可替换内联元素，image的默认vertical-algin为baseline,故im
 	    <span style="line-height:150px;vertical-align:bottom">bottom:xxx</span>
 	    <span>baseline文本:xxx</span>
 	</div>
+	
 效果：
 ![行盒高度186px](/images/demo4.png)
 这种情况下，
