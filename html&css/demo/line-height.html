@@ -6,9 +6,11 @@
     <title>line-height</title>
 </head>
 <style type="text/css">
-* {
+body {
     font-size: 14px;
-    line-height: 2;
+}
+body{
+    margin-bottom:200px;
 }
 
 </style>
@@ -40,6 +42,21 @@
     <span style="line-height:100px;vertical-align: text-top;">text-top文本:xxx</span>
     <span style="line-height:150px;vertical-align:bottom">bottom:xxx</span>
     <span>baseline文本:xxx</span>
+</div>
+
+<h2>demo5 文本与checkbox对齐</h2>
+<div style="width:600px;border:1px solid #ccc;line-height:1;">
+    <div class="font-size:12px"><input type="checkbox"><span>字体12px</span> <input type="radio"><span>字体12px</span></div>
+    <div class="font-size:14px"><input type="checkbox"><span>字体14px</span> <input type="radio"><span>字体14px</span></div>
+</div>
+<div style="width:600px;border:1px solid #ccc;line-height:1;">
+    <div class="font-size:12px"><input type="checkbox"><span>字体12px</span>    <img height="100" src="http://img.mp.itc.cn/upload/20160323/ebfce2b87c7a4a8cbe9bd43b592aa22c_th.jpg" />
+</div>
+
+<h2>inline-block盒子检测</h2>
+<div style="width:600px;border:1px solid #ccc;line-height:1;">
+    <span>baseline</span>
+    <span style="vertical-align:text-top;margin-top:100px;">text-top</span>
 </div>
 </body>
 

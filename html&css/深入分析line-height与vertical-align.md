@@ -185,11 +185,26 @@ image为不可替换内联元素，image的默认vertical-algin为baseline,故im
 - 如果第二种种盒子导致的行盒最高, 则先将剩余的第二种盒子与行盒对齐，再将剩下第一种盒子与strut对齐，如果盒子溢出，将strut反向移动，以刚好包容在行盒内。
 
 #实际应用
-
-### checkbox与文本对齐
-
-### input与文本对齐
+在上面的章节里面，我们深入分析line-height与vertical-algin的影响，但是，实际在项目很少会遇到非常复杂的多个inline box的布局，我们实际遇到更多的问题是文本与其他元素(大部分是客替换内联元素)的垂直对齐问题，下面我们一一分析.
 
 ### 图片与文本对齐
+在demo1厘米我们举例了图片与文本对齐，图片与文本对齐，除了要注意初始值话，其他的严格按照规则对齐即可
 
-### icon与文本对齐
+### checkbox/radio与文本对齐
+checkbox是属于不可替换元素，其对齐的盒子为margin-box盒子，我们先看看不同浏览器中默认的样式:
+mac系统中: baseline无效，实际效果与middel一致,mac下checkbox的size会随font-size的大小而改变
+window(ie,firefox): checkbox的 baseline 有效
+window(chrome): checkbox的 baseline 有效 checkbox对齐的盒子没有严格按照规范来，并不是margin-box,而是border/content box
+另外不同的浏览器下，checkbox的size不一致
+
+如何保持一致？ 就是避免各个浏览导致的影响:
+- 固定尺寸: width:13px;heigth:13px;
+- 统一margin: margin: 0 5px 0 0;
+- 设置兼容各个浏览器的vertical-align: vertical-align:middle;(设置middle有一次好处，line-height对其居中位置没有影响)
+
+input[type='checkbox'],input[type='radio']{
+	width: 14px;
+	height: 14px;
+	margin: 0 5px 0 0;
+	vertical-align: middle;
+}
