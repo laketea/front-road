@@ -108,11 +108,13 @@ react渲染一个自定义元素时，会讲元素的属性转换为props对象�
 ## state以及生命周期
 构造函数中，需要调用超类的构造函数 super(props) (why?);
 state注意事项：
+
 - state中仅存放渲染相关的数据
 - 仅在构造函数中定义state对象，其他地方都使用setState方法来修改state，否则不起作用 (state可能等于虚拟dom与实际dom的同步的触发点
 - )
 - state状态改变后，dom的改变可能是异步的 (state改变后，何时修改dom)
 - state状态改变会被合并 (？何时被合并)
+
 
     // Wrong 因为是异步的，所以真正执行的时候，counter，increment可能都改变了
     this.setState({
@@ -123,7 +125,14 @@ state注意事项：
       counter: prevState.counter + props.increment
     }));
 
+从上面几点我们可以总结出component中的变量分为三种:
+
+- props 传递过来的属性
+- state 与渲染或者试图相关的状态
+- this 上面两者之外的一些中间变量或者控制属性
+
 组件的生命周期：
+
 - componentDidMount 组件已经渲染在dom之后，这个时候props已经可用, 如果想存储一些不是用于展示的数据，则可以添加一些额外的属性到对象上（需要了解不同的周期的具体执行过程）
 - componentWillUnmount 
 
