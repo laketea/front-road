@@ -34,13 +34,14 @@ start和test属于特殊命令，可以省略run
 参数，数之前要加上两个连词线（－－）
 dev: 开发时构建
 serve：如果没有serve命令，默认会执行node server.js
+npm run不加参数的时候，会列出scripts里面所有可执行的命令
 
 #### npm link
 两种用法: 
 - npm link, 将当前模块连接到全局模块中
 - npm link $module, 将全局模块的$module模块，连接到当前模块中，则当前模块中可以require$module模块
 
-#### 其他
+#### 其他 
 npm adduser, npmjs.com注册用户
 npm publish, 发布到npmjs.com
 npm deprecate,废弃某个版本的模块
