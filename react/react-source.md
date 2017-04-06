@@ -1,5 +1,13 @@
 React Source
 ===
+主要从以下几个方面去分析:
+
+- 构建以及目录结构
+- 渲染以及更新核心类分析
+- render主流程
+- setState流程
+
+
 
 ## 构建
 react的构建比较复杂，使用了grunt gulp npm-scrpt等
@@ -86,11 +94,63 @@ ReactPureComponent 没看到区别，只是原型代理继承了ReactComponent
 ReactElement不是经典的构造器+原型方式实现的类，而是一个工程函数，运行此函数会生成一个element对象
 ReactElement:工厂函数，返回一个element对象，element就是简单的对象，拥有type,key,ref,props,_owner属性，$$typeof属性可以判断是否是react-element
 
-ReactElement.createElement:与构造函数什么区别？
+ReactElement.createElement:与构造函数什么区别？创建一个寒暑的时候，只需要传3个参数（type,config,children）
 ReactElement.createFactory:创建一个特定类型的工厂函数
 cloneAndReplaceKey:
 cloneElement:克隆元素
 isValidElement:判断是非为react-element
+
+ReactElement 接口设计，有点类似javascript的类，
+
+ReactElement 类似java的class，
+ReactElement.crreateElement,cloneEment,类似与java类上面的静态方法，用来创建新的对象，
+我们的http其实可以参考起实现
+例如: Http,Http.create,Http.clone..
+
+实际的element就是一个简单的对象:
+
+    var element = {
+      // This tag allow us to uniquely identify this as a React Element
+      $$typeof: REACT_ELEMENT_TYPE,
+      // Built-in properties that belong on the element
+      type: type,
+      key: key,
+      ref: ref,
+      props: props,
+      // Record the component responsible for creating this element.
+      _owner: owner,
+    };
+
+
+## 渲染
+
+渲染涉及到的核心类:
+
+### ReactDom 
+渲染入口文件，暴露多个对外的接口
+> /src/renders/dom/ReactDom.js
+
+- findDomNode 查找dom节点
+- render 渲染入口
+
+> ? ReactDOMInjection.inject();
+> ? ReactDOMStackInjection.inject();
+
+### ReactMount
+初始化渲染的核心类
+> /src/renders/dom/stack/clinet/ReactAmount.js
+
+- _updateRootComponent
+- _renderNewRootComponent 渲染一个新的根节点组件到dom中
+- renderSubtreeIntoContainer
+- _renderSubtreeIntoContainer
+   先将element包装成一个wrappedElement,将原先的element,放到新的element的child中，接着调用_renderNewRootComponent方法
+- render 入口
+- unmountComponentAtNode
+- _mountImageIntoNode
+
+
+
 
 
 
