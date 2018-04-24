@@ -55,12 +55,77 @@ http://images.cnitblog.com/blog/244227/201304/10231048-067b5e5d8cbc4acb80424b578
 
 
 ### constructor
-constructor 指向对象的构造器
+constructor 是prototype上的属性，指向构造器,
 
+```javascript
 	var p = {}
 	console.log(Object.prototype) // 为一个空的对象{}
 	console.log(p.constructor === Object) // 对象直接量方式定义的对象其constructor为Object
 	console.log(p.constructor.prototype === Object.prototype) // 为true，不解释 
+```javascript
+
+修正原型constructor
+
+```javascript
+
+function Animal() {
+	
+}
+
+function Dog() {}
+
+// case 1
+Animal.prototype.constructor = Animal
+
+// case2, 如果改变prototype则可能改变其constructor属性
+Animal.prototype = {};
+Animal.prototype.constructor !== Animal
+
+
+// case3
+var animal = new Animal();
+
+animal._proto_ = Animal.prototype
+animal.constructor = Animal.prototype.constructor = Animal
+
+var dog = new Gog();
+
+dog._proto_ = Dog.prototype
+dog.constructor = Dog.prototype.constructor = Dog
+
+dog.prototye = animal;
+
+// case4
+// 此时dog的原型对象已经改为animal对象，所以constructor属性，也会从animal上查找
+dog.constructor = dog._proto_.constructor = animal.constructor;
+
+// case5 
+
+Dog.prototype = Animal.prototype;
+
+var dog = new Dog();
+
+dog.constructor = Animal
+
+//如何修正？
+var t
+Dog.prototype = Animal.prototype;
+Dog.prototype.constructor = Dog
+
+//dog的constructor修正为Dog，but Animal实例化的对象的constructor也会指向Dog
+Animal.prototype.constructor = Dog
+
+//case6 代理继承，解决上述问题
+
+function Proxy();
+
+Proxy.prototype = Animal.prototype;
+
+Dog.prototype = new Proxy();
+Dog.prototype.constructor = Dog;
+
+```
+
 
 
 __proto__:对象
