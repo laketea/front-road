@@ -62,7 +62,7 @@ mapStateToProps函数本身也可以返回一个新的函数，这样新的函�
 如果返回一个函数，
 
 如果穿入一个函数，这个是最常用的模式 （如果穿入2个参数，则会在组件属性改变的时候，重新执行）
-如果没有穿入任何东西，则会有一个默认的map实现，并将dispatch 注入你的组件中
+如果没有穿入任何东西，则会有一个默认的注map实现，并将dispatch 入你的组件中
 
 **mergeProps**
 mergeProps(stateProps, dispatchProps, ownProps): props
@@ -117,6 +117,97 @@ export default createConnect();
 这种设计非常灵活，通过warp一层函数，利用参数的默认值，来实现不同的行为，非常灵活，可以借鉴
 
 从上面代码可以看出，核心主要是3个部分 connectHoc, defaultSelectorFactory, match..
+
+**match**
+
+```
+const initMapStateToProps = match(mapStateToProps, mapStateToPropsFactories, 'mapStateToProps')
+const initMapDispatchToProps = match(mapDispatchToProps, mapDispatchToPropsFactories, 'mapDispatchToProps')
+const initMergeProps = match(mergeProps, mergePropsFactories, 'mergeProps')
+```
+
+match的作用是什么？
+
+```
+／／ 
+function match(arg, factories, name) {
+  for (let i = factories.length - 1; i >= 0; i--) {
+    const result = factories[i](arg)
+    if (result) return result
+  }
+```
+
+先以initMapStateToProps为例：
+
+```
+//mapStateToPropsFactories
+export default [
+  whenMapStateToPropsIsFunction,
+  whenMapStateToPropsIsMissing
+]
+
+```
+
+因为mapStateToProps以及mapDispatchToProps支持多种写法，这里match的作用就是匹配不同类型，并且生成最终的mapToProps
+
+在factories中，用到集中factory
+
+```
+wrapMapToPropsFunc
+wrapMapToPropsConstant
+```
+
+我们来看看wrapMapTpPropsFunc
+
+```
+
+export function wrapMapToPropsFunc(mapToProps, methodName) {
+  // 代理proxy,
+  return function initProxySelector(dispatch, { displayName }) {
+    const proxy = function mapToPropsProxy(stateOrDispatch, ownProps) {
+      return proxy.dependsOnOwnProps
+        ? proxy.mapToProps(stateOrDispatch, ownProps)
+        : proxy.mapToProps(stateOrDispatch)
+    }
+
+    proxy.dependsOnOwnProps = getDependsOnOwnProps(mapToProps)
+
+    // 这里使用前端比较常见的设计，延迟更改
+    proxy.mapToProps = function detectFactoryAndVerify(stateOrDispatch, ownProps) {
+      proxy.mapToProps = mapToProps
+      let props = proxy(stateOrDispatch, ownProps)
+        
+       // 如果mapToProps返回值为函数，则返回的函数即为新的mapTpProps
+      if (typeof props === 'function') {
+        proxy.mapToProps = props
+        proxy.dependsOnOwnProps = getDependsOnOwnProps(props)
+        props = proxy(stateOrDispatch, ownProps)
+      }
+      return props
+    }
+
+    return proxy
+  }
+}
+```
+
+在回到前面的地方：
+
+initMapStateToProps 是什么？
+
+其实就是: 
+
+```
+function initProxySelector(dispatch, ...) {
+    ....
+}
+```
+
+也就是initMapStateToProps并不是真正的mapToProps,  只是一个初始化器， 那init什么时候出实话呢？ 
+
+在后续defulatSelectory中可以看到
+
+
 
 **connectAdvanced**
 
@@ -269,6 +360,23 @@ function finalPropsSelectorFactory(dispatch, {
     options
   )
 
+}
+```
+
+上面提到initMapStateToProps只是一个init 的proxy，在这里执行一次之后，才真真成为mapStateToProps
+
+我们从命名里面液可以看到 这个selectorFactory 只是一个factory,并不是selector, 那么这个factory是在何时执行的？
+
+在Connect组件的初始化函数中执行
+
+```
+initSelector
+
+initSelector() {
+        const { dispatch } = this.store
+        const { getState } = this;
+        const sourceSelector = selectorFactory(dispatch, selectorFactoryOptions)
+        ...
 }
 ```
 
