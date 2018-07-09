@@ -27,7 +27,6 @@ MX主要有如下两个标签
 ###WebletContainer分析
 mx.weblets.WebletContainer 继承自mx.views.ViewPort；
 
-
 weblet：weblet对象
 context：weblet上下文
 核心方法:
@@ -35,6 +34,13 @@ context：weblet上下文
 	$e 添加样式webletContainer
 	$e 清空
 	base.init();
+
+	var container = new mx.weblets.WebletContainer({
+		$e: $(#container),
+		webletID:"container",
+		bundleName:"demo"
+	});
+
 
 	//根据参数来调用load方法；
 	me.load(me.webletID);

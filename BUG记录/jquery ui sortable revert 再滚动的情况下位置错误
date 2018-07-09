@@ -101,10 +101,19 @@ b:scrollTop =194 的情况下:
 
 3.如果设置了relative
 看下面代码：
+
 top = place到客户端顶部的巨鹿 - 父结点的top  - margin的top + 父结点descroll
 animation.top = cur.top - this.offset.parent.top - this.margins.top + (this.offsetParent[0] === document.body ? 0 : this.offsetParent[0].scrollTop);
 
+top = place
+
 如果父结点没有scroll，但是又被外层的div scroll了一部分，
+
+
+
+
+
+
 
 
 
